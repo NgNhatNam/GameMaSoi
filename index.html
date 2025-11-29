@@ -9,32 +9,25 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Font Creepster - Rùng rợn, ma quái */
-        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;500;700;900&display=swap');
         
         body {
             font-family: 'Roboto', sans-serif;
             background-color: #000000;
-            color: #d4d4d4;
+            color: #e5e5e5;
             overscroll-behavior: none;
-            /* Nền đỏ đen rùng rợn */
-            background-image: radial-gradient(circle at 50% 30%, #2a0a0a 0%, #000000 90%);
+            background-image: radial-gradient(circle at 50% 30%, #1a1a00 0%, #000000 100%); /* Ánh vàng nhẹ ma quái */
             min-height: 100vh;
         }
         
         .font-spooky {
             font-family: 'Creepster', cursive;
-            letter-spacing: 2px;
+            letter-spacing: 3px;
         }
 
-        /* Hiệu ứng chữ phát sáng ma quái */
-        .text-glow {
-            text-shadow: 0 0 5px rgba(220, 38, 38, 0.8), 0 0 15px rgba(185, 28, 28, 0.6);
-        }
-        
-        .text-glow-yellow {
-            text-shadow: 0 0 5px rgba(234, 179, 8, 0.8), 0 0 15px rgba(202, 138, 4, 0.6);
-        }
+        .text-glow { text-shadow: 0 0 10px rgba(220, 38, 38, 0.6); }
+        .text-glow-yellow { text-shadow: 0 0 10px rgba(234, 179, 8, 0.6); }
+        .text-glow-blue { text-shadow: 0 0 10px rgba(59, 130, 246, 0.6); }
 
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-track { background: #0f0f0f; }
@@ -45,35 +38,23 @@
             backdrop-filter: blur(4px);
         }
 
-        .tab-active {
-            border-bottom: 2px solid #ef4444;
-            color: #ef4444;
-            background: linear-gradient(to top, rgba(239, 68, 68, 0.15), transparent);
-            text-shadow: 0 0 8px rgba(239, 68, 68, 0.5);
-        }
-        .tab-inactive { color: #6b7280; }
-        
-        /* Card Style - Thủy tinh đen mờ */
         .role-card {
-            background: rgba(20, 20, 20, 0.7);
-            border: 1px solid rgba(60, 60, 60, 0.5);
+            background: rgba(30, 30, 30, 0.6);
+            border: 1px solid rgba(80, 80, 80, 0.5);
             box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(4px);
-            transition: all 0.3s ease;
+            transition: all 0.2s ease;
         }
+        .role-card:active { transform: scale(0.98); }
+
+        .animate-pulse-slow { animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+        .pb-safe { padding-bottom: env(safe-area-inset-bottom); }
         
-        .role-card:active {
-            transform: scale(0.98);
-        }
-
-        .role-card.selected {
-            border-color: #ef4444;
-            background: rgba(60, 10, 10, 0.8);
-            box-shadow: 0 0 15px rgba(239, 68, 68, 0.3);
-        }
-
-        .animate-pulse-slow {
-            animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        .btn-normal {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
     </style>
 </head>
@@ -88,7 +69,6 @@
             <svg {...p} xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>{children}</svg>
         );
         const Moon = p => <Icon p={p}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></Icon>;
-        const Sun = p => <Icon p={p}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></Icon>;
         const Users = p => <Icon p={p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></Icon>;
         const Eye = p => <Icon p={p}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></Icon>;
         const Shield = p => <Icon p={p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></Icon>;
@@ -105,8 +85,6 @@
         const Pause = p => <Icon p={p}><rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/></Icon>;
         const RotateCcw = p => <Icon p={p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></Icon>;
         const X = p => <Icon p={p}><path d="M18 6 6 18"/><path d="m6 6 18 18"/></Icon>;
-        const ListIcon = p => <Icon p={p}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></Icon>;
-        const SkipForward = p => <Icon p={p}><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></Icon>;
         const Save = p => <Icon p={p}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></Icon>;
         const Plus = p => <Icon p={p}><path d="M5 12h14"/><path d="M12 5v14"/></Icon>;
         const Check = p => <Icon p={p}><polyline points="20 6 9 17 4 12"/></Icon>;
@@ -114,7 +92,7 @@
         const Trash = p => <Icon p={p}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></Icon>;
         const Refresh = p => <Icon p={p}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></Icon>;
 
-        // --- DATA ---
+        // --- CONSTANTS ---
         const DEFAULT_ROLES = [
             { id: 'villager', name: 'Dân Làng', team: 'good', defaultCount: 3, icon: Users, desc: 'Không có chức năng đặc biệt. Ngủ ngon và cố gắng không chết.', isDefault: true },
             { id: 'werewolf', name: 'Ma Sói', team: 'bad', defaultCount: 2, icon: Moon, desc: 'Dậy đêm cắn người. Hãy giả nai vào ban ngày.', isDefault: true },
@@ -129,17 +107,16 @@
             { id: 'jester', name: 'Kẻ Chán Đời', team: 'neutral', defaultCount: 0, icon: Ghost, desc: 'Mục tiêu duy nhất: Hãy làm cho mọi người treo cổ bạn.', isDefault: true },
         ];
 
-        // --- UPDATED STATUS TAGS ---
-        const STATUS_TAGS = [
-            { id: 'bitten', label: 'CẮN', emoji: '🐺', color: 'bg-red-800 text-white border-red-500' },
-            { id: 'protected', label: 'SHIELD', emoji: '🛡️', color: 'bg-blue-600 text-white border-blue-400' },
-            { id: 'saved', label: 'CỨU', emoji: '💉', color: 'bg-green-600 text-white border-green-400' },
-            { id: 'poisoned', label: 'ĐỘC', emoji: '🤢', color: 'bg-green-800 text-white border-green-600' },
-            { id: 'target', label: 'SOI', emoji: '👁️', color: 'bg-yellow-600 text-white border-yellow-400' },
-            { id: 'silenced', label: 'CÂM', emoji: '🤐', color: 'bg-gray-500 text-white border-gray-400' },
-            { id: 'love', label: 'YÊU', emoji: '❤️', color: 'bg-pink-600 text-white border-pink-400', isPersistent: true },
-            { id: 'hypnotized', label: 'THÔI MIÊN', emoji: '😵‍💫', color: 'bg-purple-600 text-white border-purple-400', isPersistent: true },
-            { id: 'jailed', label: 'GIAM', emoji: '⛓️', color: 'bg-zinc-700 text-white border-zinc-500' },
+        // --- UPDATED STATUS TAGS WITH EFFECTS ---
+        // Effects: 'kill' (Hard kill/Poison), 'damage' (Soft kill/Bite), 'save' (Save/Protect), 'none' (Info only)
+        const DEFAULT_STATUS_TAGS = [
+            { id: 'bitten', label: 'CẮN', emoji: '🐺', color: 'bg-red-800 text-white border-red-500', effect: 'damage' },
+            { id: 'poisoned', label: 'ĐỘC', emoji: '🤢', color: 'bg-green-800 text-white border-green-600', effect: 'kill' },
+            { id: 'protected', label: 'SHIELD', emoji: '🛡️', color: 'bg-blue-600 text-white border-blue-400', effect: 'save' },
+            { id: 'saved', label: 'CỨU', emoji: '💉', color: 'bg-green-600 text-white border-green-400', effect: 'save' },
+            { id: 'silenced', label: 'CÂM', emoji: '🤐', color: 'bg-gray-500 text-white border-gray-400', effect: 'none' },
+            { id: 'target', label: 'SOI', emoji: '👁️', color: 'bg-yellow-600 text-white border-yellow-400', effect: 'none' },
+            { id: 'love', label: 'YÊU', emoji: '❤️', color: 'bg-pink-600 text-white border-pink-400', effect: 'none', isPersistent: true },
         ];
 
         const NIGHT_STEPS_DEF = [
@@ -158,28 +135,73 @@
         // --- COMPONENTS ---
         const Modal = ({ children, onClose }) => (
             <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={onClose}>
-                <div className="bg-neutral-900 border-2 border-red-900/50 rounded-2xl w-full max-w-sm overflow-hidden animate-fadeIn relative shadow-[0_0_50px_rgba(220,38,38,0.2)]" onClick={e=>e.stopPropagation()}>
+                <div className="bg-neutral-900 border-2 border-red-900/50 rounded-2xl w-full max-w-sm max-h-[85vh] overflow-hidden animate-fadeIn relative shadow-[0_0_50px_rgba(220,38,38,0.2)] flex flex-col" onClick={e=>e.stopPropagation()}>
                     {children}
                 </div>
             </div>
         );
 
-        const PlayerActionModal = ({ player, roles, onClose, onUpdate, onKill, onRevive }) => {
-            if (!player) return null;
+        const AddTagModal = ({ onClose, onAdd }) => {
+            const [label, setLabel] = useState("");
+            const [emoji, setEmoji] = useState("🔮");
+            const [effect, setEffect] = useState("none");
+
             return (
                 <Modal onClose={onClose}>
-                    <div className="bg-black/50 p-4 flex justify-between items-center border-b border-red-900/30">
-                        <h3 className="text-2xl font-bold text-white flex items-center gap-2 truncate font-spooky tracking-widest text-glow">
+                    <div className="p-6 overflow-y-auto">
+                        <h3 className="text-2xl font-bold text-yellow-500 mb-4 text-center font-spooky tracking-wider">Tạo Trạng Thái Mới</h3>
+                        
+                        <div className="space-y-4">
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Tên Trạng Thái</label>
+                                <input className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white focus:border-yellow-500 outline-none" placeholder="VD: Bị Thôi Miên" value={label} onChange={e=>setLabel(e.target.value)} />
+                            </div>
+                            
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Biểu Tượng (Icon/Emoji)</label>
+                                <input className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white text-center text-2xl focus:border-yellow-500 outline-none" value={emoji} onChange={e=>setEmoji(e.target.value)} />
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-gray-400 uppercase mb-1">Chức Năng (Effect)</label>
+                                <select className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white outline-none" value={effect} onChange={e=>setEffect(e.target.value)}>
+                                    <option value="none">Vô hại (Đánh dấu)</option>
+                                    <option value="kill">Gây Chết (Mạnh - Không cứu được)</option>
+                                    <option value="damage">Sát Thương (Yếu - Cứu được)</option>
+                                    <option value="save">Cứu / Bảo Vệ</option>
+                                </select>
+                            </div>
+
+                            <div className="flex gap-3 pt-2">
+                                <button onClick={onClose} className="btn-normal flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-gray-400">Hủy</button>
+                                <button onClick={() => { if(label) { onAdd({ id: Date.now().toString(), label, emoji, effect, color: 'bg-purple-600 text-white border-purple-400' }); onClose(); } }} className="btn-normal flex-1 py-3 bg-yellow-700 hover:bg-yellow-600 rounded-lg text-white">TẠO</button>
+                            </div>
+                        </div>
+                    </div>
+                </Modal>
+            )
+        };
+
+        const PlayerActionModal = ({ player, roles, tags, onClose, onUpdate, onKill, onRevive, onAddTag }) => {
+            const [showAddTag, setShowAddTag] = useState(false);
+
+            if (showAddTag) return <AddTagModal onClose={()=>setShowAddTag(false)} onAdd={onAddTag} />;
+            if (!player) return null;
+
+            return (
+                <Modal onClose={onClose}>
+                    <div className="bg-black/50 p-4 flex justify-between items-center border-b border-red-900/30 shrink-0">
+                        <h3 className="text-xl font-bold text-white flex items-center gap-2 truncate text-glow">
                             <Settings size={24} className="text-red-500"/>
                             {player.name}
                         </h3>
-                        <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors"><X /></button>
+                        <button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors p-2"><X /></button>
                     </div>
 
-                    <div className="p-5 space-y-5 max-h-[70vh] overflow-y-auto">
+                    <div className="p-5 space-y-5 overflow-y-auto">
                         {/* Vai Trò */}
                         <div>
-                            <label className="block text-xs font-bold text-red-500 uppercase mb-2 font-spooky tracking-wider">Vai Trò Hiện Tại</label>
+                            <label className="block text-xs font-bold text-red-500 uppercase mb-2 tracking-wider">Vai Trò Hiện Tại</label>
                             <select 
                                 value={player.roleId} 
                                 onChange={(e) => onUpdate(player.id, { roleId: e.target.value })}
@@ -196,20 +218,23 @@
                         {/* HP */}
                         {player.hp !== undefined && (
                             <div>
-                                <label className="block text-xs font-bold text-red-500 uppercase mb-2 font-spooky tracking-wider">Mạng Sống</label>
+                                <label className="block text-xs font-bold text-red-500 uppercase mb-2 tracking-wider">Mạng Sống</label>
                                 <div className="flex items-center gap-4 bg-neutral-800 p-2 rounded-lg border border-neutral-700">
-                                    <button onClick={() => onUpdate(player.id, { hp: Math.max(0, player.hp - 1) })} className="w-10 h-10 bg-red-900/50 hover:bg-red-800 rounded-lg font-bold text-white border border-red-700 flex items-center justify-center text-xl transition-all">-</button>
-                                    <span className="text-3xl font-bold text-white flex-1 text-center font-spooky text-glow">{player.hp}</span>
-                                    <button onClick={() => onUpdate(player.id, { hp: player.hp + 1 })} className="w-10 h-10 bg-green-900/50 hover:bg-green-800 rounded-lg font-bold text-white border border-green-700 flex items-center justify-center text-xl transition-all">+</button>
+                                    <button onClick={() => onUpdate(player.id, { hp: Math.max(0, player.hp - 1) })} className="w-12 h-12 bg-red-900/50 hover:bg-red-800 rounded-lg font-bold text-white border border-red-700 flex items-center justify-center text-xl transition-all">-</button>
+                                    <span className="text-3xl font-bold text-white flex-1 text-center text-glow">{player.hp}</span>
+                                    <button onClick={() => onUpdate(player.id, { hp: player.hp + 1 })} className="w-12 h-12 bg-green-900/50 hover:bg-green-800 rounded-lg font-bold text-white border border-green-700 flex items-center justify-center text-xl transition-all">+</button>
                                 </div>
                             </div>
                         )}
 
                         {/* Tags */}
                         <div>
-                            <label className="block text-xs font-bold text-red-500 uppercase mb-2 font-spooky tracking-wider">Trạng Thái (Tags)</label>
+                            <div className="flex justify-between items-center mb-2">
+                                <label className="block text-xs font-bold text-red-500 uppercase tracking-wider">Trạng Thái (Tags)</label>
+                                <button onClick={()=>setShowAddTag(true)} className="text-[10px] bg-neutral-800 border border-neutral-600 px-2 py-1 rounded hover:bg-neutral-700 flex items-center gap-1">+ THÊM</button>
+                            </div>
                             <div className="grid grid-cols-3 gap-2">
-                                {STATUS_TAGS.map(tag => {
+                                {tags.map(tag => {
                                     const isActive = (player.tags || []).includes(tag.id);
                                     return (
                                         <button
@@ -218,11 +243,11 @@
                                                 const newTags = isActive ? player.tags.filter(t => t !== tag.id) : [...(player.tags||[]), tag.id];
                                                 onUpdate(player.id, { tags: newTags });
                                             }}
-                                            className={`py-3 rounded-lg text-xs font-bold border-2 transition-all flex flex-col items-center justify-center gap-1 relative overflow-hidden group
+                                            className={`py-3 rounded-lg text-xs font-bold border-2 transition-all flex flex-col items-center justify-center gap-1 relative overflow-hidden group min-h-[70px]
                                                 ${isActive ? `${tag.color} shadow-[0_0_10px_currentColor]` : 'bg-neutral-800 border-neutral-700 text-gray-500 hover:border-gray-500'}`}
                                         >
                                             <span className="text-2xl z-10">{tag.emoji}</span>
-                                            <span className="text-[10px] font-spooky tracking-widest z-10">{tag.label}</span>
+                                            <span className="text-[10px] tracking-widest z-10 text-center px-1">{tag.label}</span>
                                             {isActive && <div className="absolute inset-0 bg-white/10 animate-pulse"></div>}
                                         </button>
                                     );
@@ -233,11 +258,11 @@
                         {/* Kill/Revive */}
                         <div className="pt-4 border-t border-red-900/30">
                             {player.isAlive ? (
-                                <button onClick={() => { onKill(player.id); onClose(); }} className="w-full bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-white py-4 rounded-xl font-bold flex justify-center items-center gap-3 font-spooky tracking-[3px] text-2xl shadow-lg shadow-red-900/30 border border-red-700 transition-all hover:scale-[1.02]">
+                                <button onClick={() => { onKill(player.id); onClose(); }} className="btn-normal w-full bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 text-white py-4 rounded-xl flex justify-center items-center gap-3 text-xl shadow-lg shadow-red-900/30 border border-red-700 transition-all hover:scale-[1.02]">
                                     <Skull size={24} /> KHAI TỬ
                                 </button>
                             ) : (
-                                <button onClick={() => { onRevive(player.id); onClose(); }} className="w-full bg-gradient-to-r from-green-900 to-green-800 hover:from-green-800 hover:to-green-700 text-white py-4 rounded-xl font-bold flex justify-center items-center gap-3 font-spooky tracking-[3px] text-2xl shadow-lg shadow-green-900/30 border border-green-700 transition-all hover:scale-[1.02]">
+                                <button onClick={() => { onRevive(player.id); onClose(); }} className="btn-normal w-full bg-gradient-to-r from-green-900 to-green-800 hover:from-green-800 hover:to-green-700 text-white py-4 rounded-xl flex justify-center items-center gap-3 text-xl shadow-lg shadow-green-900/30 border border-green-700 transition-all hover:scale-[1.02]">
                                     <RotateCcw size={24} /> HỒI SINH
                                 </button>
                             )}
@@ -252,28 +277,28 @@
 
             return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={onClose}>
-                     <div className="bg-neutral-900 rounded-2xl shadow-[0_0_60px_rgba(0,0,0,0.9)] border-2 border-neutral-700 w-full max-w-sm overflow-hidden relative group" onClick={e => e.stopPropagation()}>
+                     <div className="bg-neutral-900 rounded-2xl shadow-[0_0_60px_rgba(0,0,0,0.9)] border-2 border-neutral-700 w-full max-w-sm overflow-hidden relative group max-h-[85vh] overflow-y-auto" onClick={e => e.stopPropagation()}>
                         <div className="absolute inset-0 bg-red-500/5 pointer-events-none"></div>
                         
                         <div className="p-8 flex flex-col items-center text-center animate-fadeIn relative z-10">
-                            <h3 className="text-lg text-gray-400 font-bold mb-6 uppercase tracking-[4px] font-spooky border-b border-red-900/50 pb-2 w-full">Danh tính của {player.name}</h3>
+                            <h3 className="text-lg text-gray-400 font-bold mb-6 uppercase tracking-[4px] border-b border-red-900/50 pb-2 w-full">Danh tính của {player.name}</h3>
                             
-                            <div className={`w-40 h-40 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,0,0,0.8)] border-4 ${roleConfig.team === 'bad' ? 'bg-red-950 border-red-600 text-red-500' : (roleConfig.team==='neutral'?'bg-yellow-950 border-yellow-600 text-yellow-500':'bg-blue-950 border-blue-600 text-blue-500')} relative`}>
+                            <div className={`w-40 h-40 rounded-full flex items-center justify-center mb-6 shadow-[0_0_30px_rgba(0,0,0,0.8)] border-4 ${roleConfig.team === 'bad' ? 'bg-red-950 border-red-600 text-red-500' : (roleConfig.team==='neutral'?'bg-yellow-950 border-yellow-600 text-yellow-500':'bg-blue-950 border-blue-600 text-blue-500')} relative shrink-0`}>
                                 <div className="absolute inset-0 rounded-full bg-black/20"></div>
                                 {roleConfig.icon ? <roleConfig.icon size={80} className="relative z-10 drop-shadow-lg"/> : <Star size={80}/>}
                             </div>
                             
-                            <h2 className={`text-5xl font-spooky mb-4 text-glow tracking-widest ${roleConfig.team === 'bad' ? 'text-red-500' : (roleConfig.team === 'neutral' ? 'text-yellow-500' : 'text-blue-500')}`}>
+                            <h2 className={`text-4xl md:text-5xl mb-4 text-glow tracking-widest font-bold uppercase ${roleConfig.team === 'bad' ? 'text-red-500' : (roleConfig.team === 'neutral' ? 'text-yellow-500' : 'text-blue-500')}`}>
                                 {roleConfig.name}
                             </h2>
                             
-                            <p className="text-gray-300 mb-8 text-lg italic font-serif leading-relaxed border-t border-b border-white/5 py-4 w-full bg-black/20">
+                            <p className="text-gray-300 mb-8 text-lg italic leading-relaxed border-t border-b border-white/5 py-4 w-full bg-black/20">
                                 "{roleConfig.desc}"
                             </p>
                             
                             <button 
                                 onClick={onClose}
-                                className="w-full py-4 bg-neutral-800 hover:bg-neutral-700 text-white font-bold rounded-xl border border-neutral-600 flex items-center justify-center gap-2 font-spooky text-2xl tracking-widest transition-all hover:scale-105"
+                                className="btn-normal w-full py-4 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl border border-neutral-600 flex items-center justify-center gap-2 text-xl tracking-widest transition-all hover:scale-105"
                             >
                                 <Check size={28}/> ĐÃ HIỂU
                             </button>
@@ -289,18 +314,18 @@
             const [team, setTeam] = useState("good");
             return (
                 <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={onClose}>
-                    <div className="bg-neutral-900 rounded-2xl border-2 border-neutral-700 w-full max-w-sm p-6 shadow-2xl" onClick={e=>e.stopPropagation()}>
-                        <h3 className="text-3xl font-bold text-red-500 mb-6 font-spooky text-center text-glow tracking-widest">Thêm Vai Trò Mới</h3>
+                    <div className="bg-neutral-900 rounded-2xl border-2 border-neutral-700 w-full max-w-sm p-6 shadow-2xl max-h-[85vh] overflow-y-auto" onClick={e=>e.stopPropagation()}>
+                        <h3 className="text-3xl font-bold text-red-500 mb-6 text-center text-glow tracking-widest uppercase font-spooky">Thêm Vai Trò Mới</h3>
                         <input className="w-full mb-4 bg-black border border-neutral-700 rounded-lg p-3 text-white placeholder-gray-600 focus:border-red-500 outline-none" placeholder="Tên vai trò (VD: Sói Lửa)" value={name} onChange={e=>setName(e.target.value)} />
                         <select className="w-full mb-4 bg-black border border-neutral-700 rounded-lg p-3 text-white outline-none" value={team} onChange={e=>setTeam(e.target.value)}>
                             <option value="good">Phe Dân (Tốt)</option>
                             <option value="bad">Phe Sói (Xấu)</option>
-                            <option value="neutral">Phe Thứ 3</option>
+                            <option value="neutral">Phe Thứ 3 (Vàng)</option>
                         </select>
                         <input className="w-full mb-6 bg-black border border-neutral-700 rounded-lg p-3 text-white placeholder-gray-600 focus:border-red-500 outline-none" placeholder="Mô tả ngắn..." value={desc} onChange={e=>setDesc(e.target.value)} />
                         <div className="flex gap-3">
-                            <button onClick={onClose} className="flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-gray-400 font-bold">Hủy</button>
-                            <button onClick={() => { if(name) { onAdd({name, desc, team}); onClose(); } }} className="flex-1 py-3 bg-red-700 hover:bg-red-600 rounded-lg text-white font-bold font-spooky tracking-widest text-lg">THÊM</button>
+                            <button onClick={onClose} className="btn-normal flex-1 py-3 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-gray-400">Hủy</button>
+                            <button onClick={() => { if(name) { onAdd({name, desc, team}); onClose(); } }} className="btn-normal flex-1 py-3 bg-red-700 hover:bg-red-600 rounded-lg text-white">THÊM</button>
                         </div>
                     </div>
                 </div>
@@ -312,11 +337,13 @@
             const [phase, setPhase] = useState('SETUP'); 
             const [rolesConfig, setRolesConfig] = useState(() => JSON.parse(localStorage.getItem('rolesConfig')) || DEFAULT_ROLES);
             const [playerNamesInput, setPlayerNamesInput] = useState(() => localStorage.getItem('playerNamesInput') || "Tí\nSửu\nDần\nMão\nThìn\nTị\nNgọ\nMùi");
-            
+            const [statusTags, setStatusTags] = useState(() => JSON.parse(localStorage.getItem('statusTags')) || DEFAULT_STATUS_TAGS);
+
             useEffect(() => {
                 localStorage.setItem('rolesConfig', JSON.stringify(rolesConfig));
                 localStorage.setItem('playerNamesInput', playerNamesInput);
-            }, [rolesConfig, playerNamesInput]);
+                localStorage.setItem('statusTags', JSON.stringify(statusTags));
+            }, [rolesConfig, playerNamesInput, statusTags]);
 
             const [players, setPlayers] = useState([]);
             const [dayCount, setDayCount] = useState(1);
@@ -343,7 +370,6 @@
                 });
             }, [phase, rolesConfig, players, dayCount]);
 
-            // Define updateRoleCount inside the component
             const updateRoleCount = (id, delta) => {
                 setRolesConfig(prev => prev.map(r => r.id === id ? { ...r, count: Math.max(0, (r.count??r.defaultCount) + delta) } : r));
             };
@@ -352,6 +378,10 @@
                 if(confirm("Bạn có chắc chắn muốn xóa vai trò này?")) {
                     setRolesConfig(prev => prev.filter(r => r.id !== id));
                 }
+            };
+
+            const addCustomTag = (newTag) => {
+                setStatusTags(prev => [...prev, newTag]);
             };
 
             const startGame = () => {
@@ -407,12 +437,12 @@
             };
 
             const clearNightTags = () => {
-                if(!confirm("Bạn có chắc muốn xóa tất cả trạng thái tạm thời (Cắn, Bảo Vệ, Cứu, Soi, Câm, Độc...)?")) return;
+                if(!confirm("Bạn có chắc muốn xóa tất cả trạng thái tạm thời?")) return;
                 
                 setPlayers(prev => prev.map(p => {
                     // Keep only persistent tags
                     const persistentTags = p.tags.filter(tId => {
-                        const tagDef = STATUS_TAGS.find(t => t.id === tId);
+                        const tagDef = statusTags.find(t => t.id === tId);
                         return tagDef && tagDef.isPersistent;
                     });
                     return { ...p, tags: persistentTags };
@@ -420,45 +450,42 @@
             };
 
             const morningEvents = useMemo(() => {
-                return players.filter(p => p.isAlive && p.tags && (p.tags.includes('bitten') || p.tags.includes('poisoned')))
+                return players.filter(p => p.isAlive)
                     .map(p => {
-                        let status = 'dead'; let msg = 'Chết'; let action = 'kill';
-                        
-                        if (p.tags.includes('poisoned')) { 
-                            status = 'dead'; 
-                            msg = 'Trúng độc chết'; 
-                            action = 'kill'; 
-                        } 
-                        else if (p.tags.includes('bitten')) {
-                            if (p.tags.includes('saved')) { 
-                                status = 'saved'; 
-                                msg = 'Được Phù Thủy Cứu'; 
-                                action = 'none'; 
+                        let status = 'alive'; 
+                        let msg = ''; 
+                        let action = 'none';
+                        let isSaved = false;
+
+                        // Check saves first
+                        const saveTags = p.tags.map(t => statusTags.find(x => x.id === t)).filter(x => x && x.effect === 'save');
+                        if (saveTags.length > 0) isSaved = true;
+
+                        // Check negative effects
+                        p.tags.forEach(tId => {
+                            const tag = statusTags.find(x => x.id === tId);
+                            if (!tag) return;
+
+                            if (tag.effect === 'kill') {
+                                // Poison overrides save usually, but for custom kill let's assume it's lethal
+                                status = 'dead'; msg = `Chết do ${tag.label}`; action = 'kill';
+                            } else if (tag.effect === 'damage') {
+                                if (isSaved) {
+                                    status = 'saved'; msg = 'Được Cứu/Bảo Vệ'; action = 'none';
+                                } else if (p.roleId === 'elder' && p.hp > 1) {
+                                    status = 'damaged'; msg = 'Mất 1 Mạng'; action = 'damage';
+                                } else if (p.roleId === 'lycan') {
+                                    status = 'transform'; msg = 'Hóa Sói'; action = 'transform';
+                                } else {
+                                    status = 'dead'; msg = `Chết do ${tag.label}`; action = 'kill';
+                                }
                             }
-                            else if (p.tags.includes('protected')) { 
-                                status = 'saved'; 
-                                msg = 'Được Bảo Vệ'; 
-                                action = 'none'; 
-                            } 
-                            else if (p.roleId === 'elder' && p.hp > 1) { 
-                                status = 'damaged'; 
-                                msg = 'Mất 1 mạng'; 
-                                action = 'damage'; 
-                            } 
-                            else if (p.roleId === 'lycan') { 
-                                status = 'transform'; 
-                                msg = 'Hóa Sói'; 
-                                action = 'transform'; 
-                            } 
-                            else { 
-                                status = 'dead'; 
-                                msg = 'Bị cắn chết'; 
-                                action = 'kill'; 
-                            }
-                        }
+                        });
+
+                        if (status === 'alive') return null;
                         return { ...p, outcome: status, outcomeMsg: msg, action };
-                    });
-            }, [players]);
+                    }).filter(Boolean);
+            }, [players, statusTags]);
 
             const deadPlayers = useMemo(() => players.filter(p => !p.isAlive), [players]);
 
@@ -483,11 +510,11 @@
                                 <div className="role-card p-6 rounded-2xl relative group">
                                     <div className="absolute inset-0 bg-red-900/5 rounded-2xl pointer-events-none group-hover:bg-red-900/10 transition-colors"></div>
                                     <div className="flex justify-between mb-4 items-end relative z-10">
-                                        <h3 className="font-spooky text-3xl text-yellow-500 tracking-wider">Danh Sách ({totalNames})</h3>
+                                        <h3 className="text-2xl md:text-3xl text-yellow-500 tracking-wider font-bold">Danh Sách ({totalNames})</h3>
                                         <span className="text-xs text-gray-500 flex items-center gap-1"><Save size={12}/> Saved</span>
                                     </div>
                                     <textarea 
-                                        className="w-full h-80 bg-black/60 border border-neutral-700 rounded-xl p-4 text-gray-300 focus:border-red-500 focus:bg-black/80 outline-none resize-none font-mono text-lg leading-relaxed relative z-10 transition-colors"
+                                        className="w-full h-60 md:h-80 bg-black/60 border border-neutral-700 rounded-xl p-4 text-gray-300 focus:border-red-500 focus:bg-black/80 outline-none resize-none font-sans text-lg leading-relaxed relative z-10 transition-colors"
                                         value={playerNamesInput}
                                         onChange={e => setPlayerNamesInput(e.target.value)}
                                         placeholder="Nhập tên người chơi (mỗi dòng 1 người)..."
@@ -496,8 +523,8 @@
 
                                 <div className="role-card p-6 rounded-2xl flex flex-col h-[500px] relative">
                                     <div className="flex justify-between items-center mb-4 relative z-10">
-                                        <h3 className="font-spooky text-3xl text-blue-500 tracking-wider">Vai Trò <span className="text-xl">({totalSelected})</span></h3>
-                                        <button onClick={()=>setShowAddRole(true)} className="text-xs bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 px-3 py-1.5 rounded-lg font-bold text-gray-300 transition-colors">+ TÙY CHỈNH</button>
+                                        <h3 className="text-2xl md:text-3xl text-blue-500 tracking-wider font-bold">Vai Trò <span className="text-xl">({totalSelected})</span></h3>
+                                        <button onClick={()=>setShowAddRole(true)} className="text-xs bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 px-3 py-1.5 rounded-lg font-bold text-gray-300 transition-colors btn-normal">+ TÙY CHỈNH</button>
                                     </div>
                                     <div className="flex-1 overflow-y-auto pr-2 space-y-2 relative z-10 custom-scrollbar">
                                         {rolesConfig.map(role => {
@@ -505,11 +532,11 @@
                                             return (
                                                 <div key={role.id} className="flex items-center justify-between bg-black/40 p-3 rounded-lg border border-neutral-800 hover:border-neutral-600 transition-all">
                                                     <div className="flex items-center gap-4 flex-1">
-                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${role.team === 'bad' ? 'bg-red-900/30 text-red-500' : 'bg-blue-900/30 text-blue-500'}`}>
+                                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center shrink-0 ${role.team === 'bad' ? 'bg-red-900/30 text-red-500' : (role.team==='neutral'?'bg-yellow-900/30 text-yellow-500':'bg-blue-900/30 text-blue-500')}`}>
                                                             {role.icon ? <role.icon size={20}/> : <Users size={20}/>}
                                                         </div>
                                                         <div className="truncate">
-                                                            <div className="font-bold text-lg font-spooky tracking-wider text-gray-300">{role.name}</div>
+                                                            <div className="font-bold text-lg tracking-wide text-gray-300">{role.name}</div>
                                                         </div>
                                                     </div>
                                                     
@@ -530,7 +557,7 @@
                                     <button 
                                         onClick={startGame}
                                         disabled={totalSelected !== totalNames}
-                                        className={`mt-4 w-full py-4 rounded-xl font-spooky text-3xl tracking-[4px] transition-all relative z-10 ${totalSelected === totalNames ? 'bg-red-800 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:scale-[1.02]' : 'bg-neutral-800 text-gray-600 cursor-not-allowed border border-neutral-700'}`}
+                                        className={`btn-normal mt-4 w-full py-4 rounded-xl text-3xl tracking-[2px] transition-all relative z-10 ${totalSelected === totalNames ? 'bg-red-800 hover:bg-red-700 text-white shadow-[0_0_20px_rgba(220,38,38,0.4)] hover:scale-[1.02]' : 'bg-neutral-800 text-gray-600 cursor-not-allowed border border-neutral-700'}`}
                                     >
                                         BẮT ĐẦU
                                     </button>
@@ -557,32 +584,32 @@
             if (phase === 'REVEAL') {
                 return (
                     <div className="min-h-screen p-6 flex flex-col items-center justify-start pt-12">
-                        <h2 className="text-6xl font-spooky text-yellow-500 mb-2 text-glow-yellow tracking-widest">PHÁT BÀI</h2>
-                        <p className="text-gray-500 mb-10 font-serif italic">"Màn đêm buông xuống, hãy nhận lấy định mệnh của mình..."</p>
+                        <h2 className="text-6xl font-spooky text-yellow-500 mb-2 text-glow-yellow tracking-widest text-center">PHÁT BÀI</h2>
+                        <p className="text-gray-500 mb-10 font-serif italic text-center">"Màn đêm buông xuống..."</p>
                         
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6 w-full max-w-5xl mb-24">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-5xl mb-24 pb-safe">
                             {players.map(p => (
                                 <button 
                                     key={p.id} 
                                     onClick={() => setRevealId(p.id)} 
-                                    className="role-card p-6 rounded-2xl flex flex-col items-center gap-4 hover:border-yellow-600/50 hover:bg-yellow-900/10 transition-all active:scale-95 group relative overflow-hidden"
+                                    className="role-card p-4 md:p-6 rounded-2xl flex flex-col items-center gap-3 hover:border-yellow-600/50 hover:bg-yellow-900/10 transition-all active:scale-95 group relative overflow-hidden"
                                 >
                                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-black/80"></div>
-                                    <div className="w-20 h-20 bg-black/50 rounded-full border border-neutral-700 flex items-center justify-center text-gray-600 group-hover:text-yellow-500 group-hover:border-yellow-500 transition-all relative z-10 shadow-lg">
-                                        <Users size={40}/>
+                                    <div className="w-16 h-16 md:w-20 md:h-20 bg-black/50 rounded-full border border-neutral-700 flex items-center justify-center text-gray-600 group-hover:text-yellow-500 group-hover:border-yellow-500 transition-all relative z-10 shadow-lg">
+                                        <Users size={32}/>
                                     </div>
-                                    <span className="font-spooky text-2xl text-gray-300 group-hover:text-white relative z-10 tracking-wide">{p.name}</span>
-                                    <span className="text-[10px] uppercase tracking-widest text-neutral-500 border border-neutral-800 px-3 py-1 rounded-full relative z-10 group-hover:border-yellow-900 group-hover:text-yellow-700">Chạm để xem</span>
+                                    <span className="text-xl md:text-2xl font-bold text-gray-300 group-hover:text-white relative z-10 tracking-wide text-center">{p.name}</span>
+                                    <span className="text-[10px] font-bold uppercase tracking-widest text-neutral-500 border border-neutral-800 px-3 py-1 rounded-full relative z-10 group-hover:border-yellow-900 group-hover:text-yellow-700">Chạm để xem</span>
                                 </button>
                             ))}
                         </div>
                         
-                        <div className="fixed bottom-0 left-0 w-full p-6 bg-black/90 backdrop-blur-md border-t border-red-900/30 flex justify-center z-40">
+                        <div className="fixed bottom-0 left-0 w-full p-6 bg-black/90 backdrop-blur-md border-t border-red-900/30 flex justify-center z-40 pb-safe">
                             <button 
                                 onClick={startMainGame} 
-                                className="px-10 py-5 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 rounded-2xl font-spooky text-3xl text-white shadow-[0_0_30px_rgba(220,38,38,0.3)] hover:scale-105 transition-all flex items-center gap-4 tracking-widest border border-red-700"
+                                className="btn-normal px-8 py-4 md:px-10 md:py-5 bg-gradient-to-r from-red-900 to-red-800 hover:from-red-800 hover:to-red-700 rounded-2xl text-2xl md:text-3xl text-white shadow-[0_0_30px_rgba(220,38,38,0.3)] hover:scale-105 transition-all flex items-center gap-4 tracking-widest border border-red-700"
                             >
-                                <Moon size={32}/> VÀO ĐÊM ĐẦU TIÊN
+                                <Moon size={28}/> VÀO ĐÊM
                             </button>
                         </div>
 
@@ -604,19 +631,19 @@
             return (
                 <div className="min-h-screen flex flex-col md:flex-row overflow-hidden bg-black">
                     {/* Control Panel */}
-                    <div className={`md:w-96 bg-neutral-900/90 border-r border-neutral-800 flex flex-col ${activeTab==='control'?'flex':'hidden md:flex'} relative z-20 shadow-2xl`}>
-                        <div className="p-8 text-center border-b border-neutral-800 bg-black/40 backdrop-blur relative">
-                            <h2 className="text-5xl font-spooky text-red-600 text-glow tracking-widest mb-1">{phase === 'GAME_NIGHT' ? `ĐÊM THỨ ${dayCount}` : `NGÀY THỨ ${dayCount}`}</h2>
+                    <div className={`md:w-96 bg-neutral-900/90 border-r border-neutral-800 flex flex-col ${activeTab==='control'?'flex':'hidden md:flex'} relative z-20 shadow-2xl h-screen md:h-auto`}>
+                        <div className="p-6 text-center border-b border-neutral-800 bg-black/40 backdrop-blur relative pt-10 md:pt-6">
+                            <h2 className="text-4xl md:text-5xl font-spooky text-red-600 text-glow tracking-widest mb-1">{phase === 'GAME_NIGHT' ? `ĐÊM THỨ ${dayCount}` : `NGÀY THỨ ${dayCount}`}</h2>
                             <div className="text-xs text-neutral-600 font-bold tracking-[4px] uppercase">Game Control Panel</div>
-                            <button onClick={endGame} className="absolute top-4 left-4 text-[10px] border border-gray-800 px-2 py-1 rounded text-gray-600 hover:text-red-500 hover:border-red-900 transition-colors uppercase font-bold">Thoát</button>
+                            <button onClick={endGame} className="btn-normal absolute top-4 left-4 text-[10px] border border-gray-800 px-2 py-1 rounded text-gray-600 hover:text-red-500 hover:border-red-900 transition-colors uppercase">Thoát</button>
                         </div>
                         
-                        <div className="flex-1 p-6 overflow-y-auto">
+                        <div className="flex-1 p-6 overflow-y-auto pb-32 md:pb-6">
                             {phase === 'GAME_NIGHT' ? (
                                 <div className="space-y-8 animate-fadeIn">
                                     <div className="text-center mt-4">
-                                        <div className="text-5xl font-bold text-white mb-3 font-spooky tracking-wider text-glow">{currentStep.title}</div>
-                                        <div className="text-emerald-400 italic text-xl font-serif bg-emerald-900/10 py-2 rounded-lg border border-emerald-900/30">"{currentStep.msg}"</div>
+                                        <div className="text-4xl md:text-5xl font-bold text-white mb-3 font-spooky tracking-wider text-glow">{currentStep.title}</div>
+                                        <div className="text-emerald-400 italic text-lg md:text-xl font-serif bg-emerald-900/10 py-2 rounded-lg border border-emerald-900/30">"{currentStep.msg}"</div>
                                     </div>
                                     
                                     {/* Role Reminder */}
@@ -625,42 +652,42 @@
                                             <div className="text-xs text-blue-400 uppercase font-bold mb-4 tracking-[4px]">Người giữ vai trò</div>
                                             <div className="flex flex-wrap justify-center gap-3">
                                                 {players.filter(p => hintIds.includes(p.id)).map(p => (
-                                                    <span key={p.id} className={`text-lg font-spooky px-4 py-2 rounded-lg border ${p.isAlive ? 'bg-blue-900/50 border-blue-700 text-white shadow-[0_0_10px_rgba(37,99,235,0.3)]' : 'bg-neutral-800 border-neutral-700 text-gray-600 line-through'}`}>{p.name}</span>
+                                                    <span key={p.id} className={`text-lg font-bold px-4 py-2 rounded-lg border ${p.isAlive ? 'bg-blue-900/50 border-blue-700 text-white shadow-[0_0_10px_rgba(37,99,235,0.3)]' : 'bg-neutral-800 border-neutral-700 text-gray-600 line-through'}`}>{p.name}</span>
                                                 ))}
                                             </div>
                                         </div>
                                     )}
 
                                     <div className="text-center text-gray-600 text-sm mt-10 italic">
-                                        (Thao tác: Bấm vào thẻ người chơi bên phải để thực hiện hành động)
+                                        (Thao tác: Bấm vào thẻ người chơi bên phải/tab danh sách để thực hiện hành động)
                                     </div>
 
-                                    <button onClick={nextStep} className="w-full py-5 bg-gradient-to-r from-blue-900 to-blue-800 hover:from-blue-800 hover:to-blue-700 text-white rounded-2xl font-spooky text-3xl tracking-[4px] shadow-lg shadow-blue-900/30 flex items-center justify-center gap-3 mt-4 hover:scale-[1.02] transition-transform border border-blue-700">
+                                    <button onClick={nextStep} className="btn-normal w-full py-5 bg-gradient-to-r from-blue-900 to-blue-800 hover:from-blue-800 hover:to-blue-700 text-white rounded-2xl text-2xl tracking-[2px] shadow-lg shadow-blue-900/30 flex items-center justify-center gap-3 mt-4 hover:scale-[1.02] transition-transform border border-blue-700 active:scale-95">
                                         TIẾP TỤC <Play size={28}/>
                                     </button>
                                 </div>
                             ) : (
-                                <div className="space-y-6 animate-fadeIn pb-20">
+                                <div className="space-y-6 animate-fadeIn">
                                     {/* Timer */}
-                                    <div className="role-card p-8 rounded-2xl text-center border-neutral-800">
-                                        <div className={`text-8xl font-mono font-bold tracking-tighter ${timer<10?'text-red-500 animate-pulse drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]':'text-white'}`}>
+                                    <div className="role-card p-6 md:p-8 rounded-2xl text-center border-neutral-800">
+                                        <div className={`text-7xl md:text-8xl font-mono font-bold tracking-tighter ${timer<10?'text-red-500 animate-pulse drop-shadow-[0_0_20px_rgba(220,38,38,0.8)]':'text-white'}`}>
                                             {Math.floor(timer/60)}:{(timer%60).toString().padStart(2,'0')}
                                         </div>
                                         <div className="flex justify-center gap-6 mt-8">
-                                            <button onClick={()=>setIsTimerRunning(!isTimerRunning)} className="w-16 h-16 bg-neutral-800 border border-neutral-700 rounded-full flex items-center justify-center hover:bg-neutral-700 hover:border-gray-500 hover:text-white text-gray-400 transition-all shadow-lg">
+                                            <button onClick={()=>setIsTimerRunning(!isTimerRunning)} className="w-16 h-16 bg-neutral-800 border border-neutral-700 rounded-full flex items-center justify-center hover:bg-neutral-700 hover:border-gray-500 hover:text-white text-gray-400 transition-all shadow-lg active:scale-95">
                                                 {isTimerRunning ? <Pause size={32}/> : <Play size={32} className="ml-1"/>}
                                             </button>
-                                            <button onClick={()=>{setTimer(120);setIsTimerRunning(false)}} className="w-16 h-16 bg-neutral-800 border border-neutral-700 rounded-full flex items-center justify-center hover:bg-neutral-700 hover:border-gray-500 hover:text-white text-gray-400 transition-all shadow-lg">
+                                            <button onClick={()=>{setTimer(120);setIsTimerRunning(false)}} className="w-16 h-16 bg-neutral-800 border border-neutral-700 rounded-full flex items-center justify-center hover:bg-neutral-700 hover:border-gray-500 hover:text-white text-gray-400 transition-all shadow-lg active:scale-95">
                                                 <RotateCcw size={32}/>
                                             </button>
                                         </div>
                                         <div className="flex gap-2 justify-center mt-6">
-                                            <button onClick={()=>setTimer(t=>t+60)} className="px-3 py-1 bg-neutral-900 border border-neutral-800 rounded text-xs text-gray-500 hover:text-white">+1m</button>
-                                            <button onClick={()=>setTimer(t=>t+30)} className="px-3 py-1 bg-neutral-900 border border-neutral-800 rounded text-xs text-gray-500 hover:text-white">+30s</button>
+                                            <button onClick={()=>setTimer(t=>t+60)} className="px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-gray-500 hover:text-white active:bg-neutral-800">+1m</button>
+                                            <button onClick={()=>setTimer(t=>t+30)} className="px-3 py-2 bg-neutral-900 border border-neutral-800 rounded-lg text-xs text-gray-500 hover:text-white active:bg-neutral-800">+30s</button>
                                         </div>
                                     </div>
 
-                                    {/* Morning Report - Direct Actions */}
+                                    {/* Morning Report */}
                                     {morningEvents.length > 0 && (
                                         <div className="bg-red-950/20 border border-red-900/40 p-5 rounded-2xl">
                                             <div className="text-red-500 font-bold uppercase text-xs mb-4 flex items-center gap-2 tracking-[2px]"><AlertTriangle size={16}/> Cập nhật buổi sáng</div>
@@ -675,10 +702,11 @@
                                                     return (
                                                         <div key={e.id} className="flex justify-between items-center bg-black/60 p-3 rounded-lg border border-neutral-800">
                                                             <div>
-                                                                <div className="font-bold font-spooky tracking-wide text-xl">{e.name}</div>
-                                                                <div className={`text-[10px] uppercase font-bold tracking-wider ${colorClass}`}>{e.outcomeMsg}</div>
+                                                                <span className="font-bold text-xl block tracking-wide">{e.name}</span>
+                                                                <span className={`text-[10px] uppercase font-bold tracking-wider ${colorClass}`}>
+                                                                    {e.outcomeMsg}
+                                                                </span>
                                                             </div>
-                                                            
                                                             {e.action === 'kill' && (
                                                                 <button 
                                                                     onClick={() => {
@@ -686,7 +714,7 @@
                                                                             setPlayers(prev => prev.map(p => p.id === e.id ? { ...p, isAlive: false } : p));
                                                                         }
                                                                     }}
-                                                                    className="bg-red-700 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded shadow-lg uppercase tracking-wider flex items-center gap-1"
+                                                                    className="btn-normal bg-red-700 hover:bg-red-600 text-white text-xs font-bold px-3 py-2 rounded shadow-lg uppercase flex items-center gap-1 active:scale-95"
                                                                 >
                                                                     <Skull size={12}/> KHAI TỬ
                                                                 </button>
@@ -694,7 +722,7 @@
                                                             {e.action === 'damage' && (
                                                                 <button 
                                                                     onClick={() => setPlayers(prev => prev.map(p => p.id === e.id ? { ...p, hp: p.hp - 1 } : p))}
-                                                                    className="bg-yellow-700 hover:bg-yellow-600 text-white text-xs font-bold px-3 py-2 rounded shadow-lg uppercase tracking-wider"
+                                                                    className="btn-normal bg-yellow-700 hover:bg-yellow-600 text-white text-xs font-bold px-3 py-2 rounded shadow-lg uppercase active:scale-95"
                                                                 >
                                                                     TRỪ MẠNG
                                                                 </button>
@@ -702,7 +730,7 @@
                                                             {e.action === 'transform' && (
                                                                 <button 
                                                                     onClick={() => setPlayers(prev => prev.map(p => p.id === e.id ? { ...p, roleId: 'werewolf' } : p))}
-                                                                    className="bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold px-3 py-2 rounded shadow-lg uppercase tracking-wider"
+                                                                    className="btn-normal bg-purple-700 hover:bg-purple-600 text-white text-xs font-bold px-3 py-2 rounded shadow-lg uppercase active:scale-95"
                                                                 >
                                                                     HÓA SÓI
                                                                 </button>
@@ -714,21 +742,21 @@
                                         </div>
                                     )}
 
-                                    {/* Graveyard / Dead List */}
+                                    {/* Graveyard */}
                                     {deadPlayers.length > 0 && (
                                         <div className="bg-neutral-900/50 border border-neutral-800 p-5 rounded-2xl">
                                             <div className="text-gray-500 font-bold uppercase text-xs mb-4 flex items-center gap-2 tracking-[2px]"><Ghost size={16}/> Danh sách người chết</div>
                                             <div className="space-y-2">
                                                 {deadPlayers.map(p => (
                                                     <div key={p.id} className="flex justify-between items-center bg-black/40 p-3 rounded-lg border border-neutral-800/50">
-                                                        <span className="font-bold font-spooky text-gray-500 line-through text-lg">{p.name}</span>
+                                                        <span className="font-bold text-gray-500 line-through text-lg">{p.name}</span>
                                                         <button 
                                                             onClick={() => {
                                                                 if(confirm(`Hồi sinh ${p.name}?`)) {
                                                                     setPlayers(prev => prev.map(x => x.id === p.id ? { ...x, isAlive: true } : x));
                                                                 }
                                                             }}
-                                                            className="bg-green-900/30 hover:bg-green-800/50 text-green-500 border border-green-900 text-[10px] font-bold px-3 py-1.5 rounded uppercase tracking-wider flex items-center gap-1 transition-colors"
+                                                            className="btn-normal bg-green-900/30 hover:bg-green-800/50 text-green-500 border border-green-900 text-[10px] font-bold px-3 py-2 rounded uppercase flex items-center gap-1 transition-colors active:scale-95"
                                                         >
                                                             <RotateCcw size={10}/> HỒI SINH
                                                         </button>
@@ -738,12 +766,11 @@
                                         </div>
                                     )}
 
-                                    <button onClick={endDay} className="w-full py-5 bg-purple-900 hover:bg-purple-800 rounded-2xl font-spooky text-3xl tracking-[4px] border border-purple-700 shadow-lg shadow-purple-900/30 text-white mt-4 transition-all hover:scale-[1.02]">
+                                    <button onClick={endDay} className="btn-normal w-full py-5 bg-purple-900 hover:bg-purple-800 rounded-2xl text-2xl tracking-[2px] border border-purple-700 shadow-lg shadow-purple-900/30 text-white mt-4 transition-all hover:scale-[1.02] active:scale-95">
                                         VÀO BAN ĐÊM
                                     </button>
                                     
-                                    {/* Clear Status Button */}
-                                    <button onClick={clearNightTags} className="w-full py-3 bg-neutral-800 hover:bg-neutral-700 rounded-xl font-bold text-gray-400 border border-neutral-700 flex items-center justify-center gap-2 transition-all text-sm uppercase tracking-wider">
+                                    <button onClick={clearNightTags} className="btn-normal w-full py-3 bg-neutral-800 hover:bg-neutral-700 rounded-xl text-gray-400 border border-neutral-700 flex items-center justify-center gap-2 transition-all text-xs tracking-wider active:scale-95">
                                         <Refresh size={16}/> Quét Sạch Trạng Thái (Reset)
                                     </button>
                                 </div>
@@ -752,21 +779,21 @@
                     </div>
 
                     {/* Players List (Grid) */}
-                    <div className={`flex-1 bg-black p-4 md:p-6 overflow-y-auto ${activeTab==='players'?'block':'hidden md:block'} relative`}>
+                    <div className={`flex-1 bg-black p-4 md:p-6 overflow-y-auto ${activeTab==='players'?'block':'hidden md:block'} relative pb-32 md:pb-6`}>
                         <div className="absolute inset-0 pointer-events-none bg-[url('https://www.transparenttextures.com/patterns/black-felt.png')] opacity-20"></div>
-                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10 pb-20 md:pb-0">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 relative z-10 pt-4 md:pt-0">
                             {players.filter(p=>showDead||p.isAlive).map(p => {
                                 const r = rolesConfig.find(x=>x.id===p.roleId);
                                 const isDead = !p.isAlive;
                                 return (
-                                    <div key={p.id} onClick={()=>setEditingPlayer(p)} className={`role-card p-4 rounded-xl relative group cursor-pointer transition-all hover:border-gray-500 hover:bg-neutral-800 ${isDead ? 'opacity-40 grayscale' : 'hover:-translate-y-1 hover:shadow-xl'}`}>
+                                    <div key={p.id} onClick={()=>setEditingPlayer(p)} className={`role-card p-4 rounded-xl relative group cursor-pointer transition-all hover:border-gray-500 hover:bg-neutral-800 active:scale-95 ${isDead ? 'opacity-40 grayscale' : 'hover:-translate-y-1 hover:shadow-xl'}`}>
                                         <div className="flex items-center gap-3 mb-3">
-                                            <div className={`w-12 h-12 rounded-xl flex items-center justify-center shadow-lg border border-white/5 ${r.team==='bad'?'bg-red-900/20 text-red-500':'bg-blue-900/20 text-blue-500'}`}>
-                                                {r.icon?<r.icon size={24}/>:<Users size={24}/>}
+                                            <div className={`w-10 h-10 md:w-12 md:h-12 rounded-xl flex items-center justify-center shadow-lg border border-white/5 ${r.team==='bad'?'bg-red-900/20 text-red-500':(r.team==='neutral'?'bg-yellow-900/20 text-yellow-500':'bg-blue-900/20 text-blue-500')}`}>
+                                                {r.icon?<r.icon size={20}/>:<Users size={20}/>}
                                             </div>
                                             <div className="overflow-hidden flex-1">
-                                                <div className={`font-spooky text-xl truncate tracking-wide ${isDead ? 'line-through text-gray-600' : 'text-gray-200 group-hover:text-white'}`}>{p.name}</div>
-                                                <div className={`text-[10px] font-bold uppercase tracking-wider ${r.team==='bad'?'text-red-600':'text-blue-600'}`}>{r.name}</div>
+                                                <div className={`font-bold text-lg md:text-xl truncate tracking-wide ${isDead ? 'line-through text-gray-600' : 'text-gray-200 group-hover:text-white'}`}>{p.name}</div>
+                                                <div className={`text-[10px] font-bold uppercase tracking-wider ${r.team==='bad'?'text-red-600':(r.team==='neutral'?'text-yellow-600':'text-blue-600')}`}>{r.name}</div>
                                             </div>
                                             <Settings size={16} className="text-gray-700 group-hover:text-gray-400"/>
                                         </div>
@@ -775,7 +802,7 @@
                                         <div className="flex flex-wrap gap-1 min-h-[24px]">
                                             {p.hp > 1 && <span className="text-[9px] font-bold px-2 py-0.5 rounded bg-green-900/30 text-green-400 border border-green-900/50">HP: {p.hp}</span>}
                                             {p.tags.map(t => {
-                                                const tagDef = STATUS_TAGS.find(x=>x.id===t);
+                                                const tagDef = statusTags.find(x=>x.id===t);
                                                 return tagDef ? <span key={t} className="text-lg" title={tagDef.label}>{tagDef.emoji}</span> : null;
                                             })}
                                         </div>
@@ -793,9 +820,9 @@
                     </div>
                     
                     {/* Mobile Tabs */}
-                    <div className="md:hidden fixed bottom-0 w-full flex bg-neutral-900 border-t border-neutral-800 z-50">
-                        <button onClick={()=>setActiveTab('control')} className={`flex-1 py-4 font-spooky text-xl tracking-widest ${activeTab==='control'?'text-red-500 bg-red-900/10':'text-gray-500'}`}>ĐIỀU KHIỂN</button>
-                        <button onClick={()=>setActiveTab('players')} className={`flex-1 py-4 font-spooky text-xl tracking-widest ${activeTab==='players'?'text-red-500 bg-red-900/10':'text-gray-500'}`}>DANH SÁCH</button>
+                    <div className="md:hidden fixed bottom-0 w-full flex bg-neutral-900/95 backdrop-blur border-t border-neutral-800 z-50 pb-safe">
+                        <button onClick={()=>setActiveTab('control')} className={`btn-normal flex-1 py-4 text-sm tracking-widest ${activeTab==='control'?'text-red-500 bg-red-900/10':'text-gray-500'}`}>ĐIỀU KHIỂN</button>
+                        <button onClick={()=>setActiveTab('players')} className={`btn-normal flex-1 py-4 text-sm tracking-widest ${activeTab==='players'?'text-red-500 bg-red-900/10':'text-gray-500'}`}>DANH SÁCH</button>
                     </div>
 
                     {/* Modals */}
@@ -803,6 +830,8 @@
                         <PlayerActionModal 
                             player={editingPlayer}
                             roles={rolesConfig}
+                            tags={statusTags}
+                            onAddTag={addCustomTag}
                             onClose={() => setEditingPlayer(null)}
                             onUpdate={(id, data) => setPlayers(prev => prev.map(p => p.id === id ? { ...p, ...data } : p))}
                             onKill={(id) => {
