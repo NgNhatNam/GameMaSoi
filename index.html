@@ -9,17 +9,17 @@
     <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;500;700;900&display=swap');
+        /* Chỉ nhập font Roboto dễ đọc */
+        @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700;900&display=swap');
         
-        /* THIẾT LẬP KHUNG HÌNH CỐ ĐỊNH */
         html, body {
             height: 100%;
             width: 100%;
-            overflow: hidden; /* Chặn cuộn trang web */
-            background-color: #000000;
-            font-family: 'Roboto', sans-serif;
+            overflow: hidden;
+            background-color: #050505;
+            font-family: 'Roboto', sans-serif; /* Font chữ thống nhất */
             color: #e5e5e5;
-            background-image: radial-gradient(circle at 50% 30%, #1a1a00 0%, #000000 100%);
+            background-image: radial-gradient(circle at 50% 30%, #1a1a1a 0%, #000000 100%);
         }
         
         #root {
@@ -29,16 +29,18 @@
             flex-direction: column;
         }
 
-        .font-spooky {
-            font-family: 'Creepster', cursive;
-            letter-spacing: 2px;
+        /* Thay thế class font-spooky cũ bằng style đậm, dễ đọc */
+        .font-title {
+            font-family: 'Roboto', sans-serif;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
-        .text-glow { text-shadow: 0 0 10px rgba(220, 38, 38, 0.6); }
-        .text-glow-yellow { text-shadow: 0 0 10px rgba(234, 179, 8, 0.6); }
+        .text-glow { text-shadow: 0 0 10px rgba(220, 38, 38, 0.5); }
+        .text-glow-yellow { text-shadow: 0 0 10px rgba(234, 179, 8, 0.5); }
 
-        /* Custom Scrollbar */
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; }
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
         .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
         .custom-scrollbar::-webkit-scrollbar-thumb { background-color: #444; border-radius: 10px; }
         
@@ -58,7 +60,6 @@
         }
         .role-card:active { transform: scale(0.99); }
 
-        /* Vùng cuộn */
         .scroll-area {
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
@@ -71,7 +72,7 @@
             font-family: 'Roboto', sans-serif;
             font-weight: 700;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: 0.5px;
         }
 
         .animate-fadeIn { animation: fadeIn 0.3s ease-out; }
@@ -114,19 +115,34 @@
         const Trash=p=><Icon p={p}><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></Icon>;
         const Refresh=p=><Icon p={p}><path d="M21 12a9 9 0 0 0-9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M3 12a9 9 0 0 0 9 9 9.75 9.75 0 0 0 6.74-2.74L21 16"/><path d="M16 21h5v-5"/></Icon>;
         const HistoryIcon=p=><Icon p={p}><path d="M3 3v5h5"/><path d="M3.05 13A9 9 0 1 0 6 5.3L3 8"/><path d="M12 7v5l4 2"/></Icon>;
+        const Edit=p=><Icon p={p}><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></Icon>;
+
+        // --- EMOJI LIST ---
+        const EMOJI_LIST = ["🐺", "🔮", "🛡️", "☠️", "❤️", "🤐", "👁️", "😵‍💫", "⛓️", "🔥", "❄️", "⚡", "💧", "🍀", "🤢", "🤕", "👻", "👹", "👺", "🤡", "💩", "💀", "👽", "🤖", "🎃", "😺", "🙈", "🙉", "🙊", "💋", "💔", "💣", "💥", "💤", "💢", "💬", "💭", "🛑", "🚫", "⚠️", "✅", "❌", "❓", "❗", "🏳️", "🏴", "🏁", "🚩", "🎵", "🎶", "💍", "👑", "💎", "🗡️", "🏹", "🩸", "💊", "🦠", "🧟", "🧛"];
+
+        // --- HELPER ---
+        const shuffleArray = (array) => {
+            let currentIndex = array.length, randomIndex;
+            while (currentIndex != 0) {
+                randomIndex = Math.floor(Math.random() * currentIndex);
+                currentIndex--;
+                [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+            }
+            return array;
+        };
 
         // --- DATA ---
         const DEFAULT_ROLES = [
             { id: 'villager', name: 'Dân Làng', team: 'good', defaultCount: 3, icon: Users, desc: 'Ngủ ngon và cố gắng không chết.', isDefault: true },
-            { id: 'werewolf', name: 'Ma Sói', team: 'bad', defaultCount: 2, icon: Moon, desc: 'Dậy đêm cắn người.', isDefault: true, nightOrder: 30 },
-            { id: 'seer', name: 'Tiên Tri', team: 'good', defaultCount: 1, icon: Eye, desc: 'Mỗi đêm soi một người.', isDefault: true, nightOrder: 60 },
-            { id: 'bodyguard', name: 'Bảo Vệ', team: 'good', defaultCount: 1, icon: Shield, desc: 'Chọn bảo vệ 1 người mỗi đêm.', isDefault: true, nightOrder: 20 },
-            { id: 'witch', name: 'Phù Thủy', team: 'good', defaultCount: 1, icon: Flask, desc: 'Có 1 Bình Cứu và 1 Bình Độc.', isDefault: true, nightOrder: 50 },
-            { id: 'hunter', name: 'Thợ Săn', team: 'good', defaultCount: 0, icon: Gavel, desc: 'Kéo theo 1 người khi chết.', isDefault: true },
+            { id: 'werewolf', name: 'Ma Sói', team: 'bad', defaultCount: 2, icon: Moon, desc: 'Dậy đêm cắn người.', isDefault: true, nightOrder: 30, nightMsg: 'Đêm nay cắn ai?' },
+            { id: 'seer', name: 'Tiên Tri', team: 'good', defaultCount: 1, icon: Eye, desc: 'Mỗi đêm soi một người.', isDefault: true, nightOrder: 60, nightMsg: 'Bạn muốn soi ai?' },
+            { id: 'bodyguard', name: 'Bảo Vệ', team: 'good', defaultCount: 1, icon: Shield, desc: 'Chọn bảo vệ 1 người mỗi đêm.', isDefault: true, nightOrder: 20, nightMsg: 'Bạn muốn bảo vệ ai?' },
+            { id: 'witch', name: 'Phù Thủy', team: 'good', defaultCount: 1, icon: Flask, desc: 'Có 1 Bình Cứu và 1 Bình Độc.', isDefault: true, nightOrder: 50, nightMsg: 'Có cứu hay giết ai không?' },
+            { id: 'hunter', name: 'Thợ Săn', team: 'good', defaultCount: 0, icon: Gavel, desc: 'Nếu bạn chết, bạn được kéo theo 1 người.', isDefault: true },
             { id: 'cupid', name: 'Thần Tình Yêu', team: 'good', defaultCount: 0, icon: Heart, desc: 'Ghép đôi 2 người.', isDefault: true, nightOrder: 10, nightLimit: 1 },
-            { id: 'elder', name: 'Già Làng', team: 'good', defaultCount: 0, icon: Star, desc: '2 mạng khi bị cắn.', hp: 2, isDefault: true, nightOrder: 70 },
-            { id: 'lycan', name: 'Bán Sói', team: 'good', defaultCount: 0, icon: PawPrint, desc: 'Hóa Sói nếu bị cắn.', isDefault: true },
-            { id: 'minion', name: 'Phản Bội', team: 'bad', defaultCount: 0, icon: UserX, desc: 'Phe Sói nhưng không cắn.', isDefault: true, nightOrder: 40, nightLimit: 1 },
+            { id: 'elder', name: 'Già Làng', team: 'good', defaultCount: 0, icon: Star, desc: '2 mạng khi bị cắn.', hp: 2, isDefault: true, nightOrder: 70, nightMsg: 'Gọi để xác nhận trạng thái.' },
+            { id: 'lycan', name: 'Bán Sói', team: 'good', defaultCount: 0, icon: PawPrint, desc: 'Ban đầu là Dân. Nếu bị Sói cắn, không chết mà hóa thành Sói.', isDefault: true },
+            { id: 'minion', name: 'Phản Bội', team: 'bad', defaultCount: 0, icon: UserX, desc: 'Phe Sói nhưng không dậy cắn.', isDefault: true, nightOrder: 40, nightLimit: 1 },
             { id: 'jester', name: 'Kẻ Chán Đời', team: 'neutral', defaultCount: 0, icon: Ghost, desc: 'Thắng nếu bị treo cổ.', isDefault: true },
         ];
 
@@ -150,7 +166,7 @@
                         {role.icon ? <role.icon size={16}/> : <Users size={16}/>}
                     </div>
                     <div className="truncate">
-                        <div className="font-bold text-sm text-gray-300">{role.name}</div>
+                        <div className="font-bold text-sm text-gray-300 font-title">{role.name}</div>
                     </div>
                 </div>
                 <div className="flex items-center gap-1 shrink-0">
@@ -182,7 +198,6 @@
             </div>
         );
         
-        // ... (Giữ nguyên các modal AddRole, RoleConfig, Reveal, PlayerAction, AddTag như cũ) ...
         const AddRoleModal = ({ onClose, onAdd }) => {
             const [name, setName] = useState("");
             const [desc, setDesc] = useState("");
@@ -191,7 +206,7 @@
             const [nightMsg, setNightMsg] = useState("");
             return (
                 <Modal onClose={onClose}>
-                    <div className="p-6 scroll-area flex-1"><h3 className="text-2xl font-bold text-red-500 mb-4 text-center font-spooky tracking-wider">Thêm Vai Trò</h3><div className="space-y-3"><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" placeholder="Tên vai trò" value={name} onChange={e=>setName(e.target.value)} /><select className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" value={team} onChange={e=>setTeam(e.target.value)}><option value="good">Phe Dân</option><option value="bad">Phe Sói</option><option value="neutral">Phe Thứ 3</option></select><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" placeholder="Mô tả..." value={desc} onChange={e=>setDesc(e.target.value)} /><div className="border-t border-neutral-700 pt-3 mt-3"><label className="text-xs text-gray-400 block mb-1 uppercase font-bold">Cấu hình Đêm (Tùy chọn)</label><input type="number" className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white mb-2" placeholder="Thứ tự gọi" value={nightOrder} onChange={e=>setNightOrder(e.target.value)} /><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white" placeholder="Câu thoại" value={nightMsg} onChange={e=>setNightMsg(e.target.value)} /></div></div><div className="flex gap-3 mt-6 shrink-0"><button onClick={onClose} className="btn-normal flex-1 py-2 bg-neutral-800 rounded-lg text-gray-400 text-sm">Hủy</button><button onClick={() => { if(name) { onAdd({name, desc, team, nightOrder: nightOrder?parseInt(nightOrder):undefined, nightMsg}); onClose(); } }} className="btn-normal flex-1 py-2 bg-red-700 rounded-lg text-white text-sm">THÊM</button></div></div>
+                    <div className="p-6 scroll-area flex-1"><h3 className="text-2xl font-bold text-red-500 mb-4 text-center font-title tracking-wider">Thêm Vai Trò</h3><div className="space-y-3"><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" placeholder="Tên vai trò" value={name} onChange={e=>setName(e.target.value)} /><select className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" value={team} onChange={e=>setTeam(e.target.value)}><option value="good">Phe Dân</option><option value="bad">Phe Sói</option><option value="neutral">Phe Thứ 3</option></select><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" placeholder="Mô tả..." value={desc} onChange={e=>setDesc(e.target.value)} /><div className="border-t border-neutral-700 pt-3 mt-3"><label className="text-xs text-gray-400 block mb-1 uppercase font-bold">Cấu hình Đêm (Tùy chọn)</label><input type="number" className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white mb-2" placeholder="Thứ tự gọi" value={nightOrder} onChange={e=>setNightOrder(e.target.value)} /><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white" placeholder="Câu thoại" value={nightMsg} onChange={e=>setNightMsg(e.target.value)} /></div></div><div className="flex gap-3 mt-6 shrink-0"><button onClick={onClose} className="btn-normal flex-1 py-2 bg-neutral-800 rounded-lg text-gray-400 text-sm">Hủy</button><button onClick={() => { if(name) { onAdd({name, desc, team, nightOrder: nightOrder?parseInt(nightOrder):undefined, nightMsg}); onClose(); } }} className="btn-normal flex-1 py-2 bg-red-700 rounded-lg text-white text-sm">THÊM</button></div></div>
                 </Modal>
             );
         };
@@ -200,16 +215,36 @@
             const [localRole, setLocalRole] = useState({...role});
             return (
                 <Modal onClose={onClose}>
-                    <div className="p-6 scroll-area flex-1"><h3 className="text-xl font-bold text-blue-500 mb-4 text-center font-spooky tracking-wider">Cấu Hình: {role.name}</h3><div className="space-y-3">{!role.isDefault && (<div><label className="block text-xs font-bold text-gray-400 uppercase mb-1">Tên Vai Trò</label><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" value={localRole.name} onChange={e=>setLocalRole({...localRole, name: e.target.value})} /></div>)}<div><label className="block text-xs font-bold text-gray-400 uppercase mb-1">Thứ Tự Đêm</label><input type="number" className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" value={localRole.nightOrder || ''} placeholder="Bỏ trống nếu không gọi" onChange={e=>setLocalRole({...localRole, nightOrder: e.target.value ? parseInt(e.target.value) : undefined})} /></div><div><label className="block text-xs font-bold text-gray-400 uppercase mb-1">Câu Thoại</label><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" value={localRole.nightMsg || ''} placeholder="VD: Sói ơi dậy đi..." onChange={e=>setLocalRole({...localRole, nightMsg: e.target.value})} /></div><div className="flex items-center gap-2"><input type="checkbox" id="limit" className="w-4 h-4 accent-blue-500" checked={localRole.nightLimit === 1} onChange={e=>setLocalRole({...localRole, nightLimit: e.target.checked ? 1 : undefined})} /><label htmlFor="limit" className="text-xs text-gray-300">Chỉ gọi đêm đầu?</label></div><div className="flex gap-3 pt-2 shrink-0"><button onClick={onClose} className="btn-normal flex-1 py-2 bg-neutral-800 rounded-lg text-gray-400 text-sm">Hủy</button><button onClick={() => { onSave(localRole); onClose(); }} className="btn-normal flex-1 py-2 bg-blue-700 rounded-lg text-white text-sm">LƯU</button></div></div></div>
+                    <div className="p-6 scroll-area flex-1"><h3 className="text-xl font-bold text-blue-500 mb-4 text-center font-title tracking-wider">Cấu Hình: {role.name}</h3><div className="space-y-3">{!role.isDefault && (<div><label className="block text-xs font-bold text-gray-400 uppercase mb-1">Tên Vai Trò</label><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" value={localRole.name} onChange={e=>setLocalRole({...localRole, name: e.target.value})} /></div>)}<div><label className="block text-xs font-bold text-gray-400 uppercase mb-1">Thứ Tự Đêm</label><input type="number" className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" value={localRole.nightOrder || ''} placeholder="Bỏ trống nếu không gọi" onChange={e=>setLocalRole({...localRole, nightOrder: e.target.value ? parseInt(e.target.value) : undefined})} /></div><div><label className="block text-xs font-bold text-gray-400 uppercase mb-1">Câu Thoại</label><input className="w-full bg-black border border-neutral-700 rounded-lg p-2 text-white outline-none" value={localRole.nightMsg || ''} placeholder="VD: Sói ơi dậy đi..." onChange={e=>setLocalRole({...localRole, nightMsg: e.target.value})} /></div><div className="flex items-center gap-2"><input type="checkbox" id="limit" className="w-4 h-4 accent-blue-500" checked={localRole.nightLimit === 1} onChange={e=>setLocalRole({...localRole, nightLimit: e.target.checked ? 1 : undefined})} /><label htmlFor="limit" className="text-xs text-gray-300">Chỉ gọi đêm đầu?</label></div><div className="flex gap-3 pt-2 shrink-0"><button onClick={onClose} className="btn-normal flex-1 py-2 bg-neutral-800 rounded-lg text-gray-400 text-sm">Hủy</button><button onClick={() => { onSave(localRole); onClose(); }} className="btn-normal flex-1 py-2 bg-blue-700 rounded-lg text-white text-sm">LƯU</button></div></div></div>
                 </Modal>
             );
         };
 
-        const AddTagModal = ({ onClose, onAdd }) => { const [label, setLabel] = useState(""); const [emoji, setEmoji] = useState("🔮"); const [effect, setEffect] = useState("none"); return (<Modal onClose={onClose}><div className="p-6 scroll-area flex-1"><h3 className="text-xl font-bold text-yellow-500 mb-4 text-center font-spooky tracking-wider">TẠO TRẠNG THÁI</h3><div className="space-y-4"><input className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white outline-none" placeholder="Tên (VD: Bị Thôi Miên)" value={label} onChange={e=>setLabel(e.target.value)} /><input className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white text-center text-2xl outline-none" value={emoji} onChange={e=>setEmoji(e.target.value)} /><select className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white outline-none" value={effect} onChange={e=>setEffect(e.target.value)}><option value="none">Vô hại</option><option value="kill">Gây Chết</option><option value="damage">Sát Thương</option><option value="save">Cứu/Bảo Vệ</option></select><div className="flex gap-3 pt-2 shrink-0"><button onClick={onClose} className="btn-normal flex-1 py-3 bg-neutral-800 rounded-lg text-gray-400">Hủy</button><button onClick={() => { if(label) { onAdd({ id: Date.now().toString(), label, emoji, effect, color: 'bg-purple-600 text-white border-purple-400' }); onClose(); } }} className="btn-normal flex-1 py-3 bg-yellow-700 rounded-lg text-white">TẠO</button></div></div></div></Modal>) };
+        const AddTagModal = ({ onClose, onAdd }) => { const [label, setLabel] = useState(""); const [emoji, setEmoji] = useState("🔮"); const [effect, setEffect] = useState("none"); return (<Modal onClose={onClose}><div className="p-6 scroll-area flex-1"><h3 className="text-xl font-bold text-yellow-500 mb-4 text-center font-title tracking-wider">TẠO TRẠNG THÁI</h3><div className="space-y-4"><input className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white outline-none" placeholder="Tên (VD: Bị Thôi Miên)" value={label} onChange={e=>setLabel(e.target.value)} /><div className="grid grid-cols-6 gap-2 h-32 overflow-y-auto custom-scrollbar border border-neutral-800 rounded-lg p-2 bg-black/50">{EMOJI_LIST.map(e => (<button key={e} onClick={() => setEmoji(e)} className={`text-xl p-2 rounded hover:bg-neutral-700 ${emoji === e ? 'bg-yellow-900/50 border border-yellow-500' : ''}`}>{e}</button>))}</div><input className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white text-center text-2xl outline-none" value={emoji} onChange={e=>setEmoji(e.target.value)} placeholder="Hoặc nhập thủ công" /><select className="w-full bg-black border border-neutral-700 rounded-lg p-3 text-white outline-none" value={effect} onChange={e=>setEffect(e.target.value)}><option value="none">Vô hại</option><option value="kill">Gây Chết</option><option value="damage">Sát Thương</option><option value="save">Cứu/Bảo Vệ</option></select><div className="flex gap-3 pt-2 shrink-0"><button onClick={onClose} className="btn-normal flex-1 py-3 bg-neutral-800 rounded-lg text-gray-400">Hủy</button><button onClick={() => { if(label) { onAdd({ id: Date.now().toString(), label, emoji, effect, color: 'bg-purple-600 text-white border-purple-400' }); onClose(); } }} className="btn-normal flex-1 py-3 bg-yellow-700 rounded-lg text-white">TẠO</button></div></div></div></Modal>) };
         
         const PlayerActionModal = ({ player, roles, tags, onClose, onUpdate, onKill, onRevive, onAddTag, onAddHistory }) => { const [showAddTag, setShowAddTag] = useState(false); if (showAddTag) return <AddTagModal onClose={()=>setShowAddTag(false)} onAdd={onAddTag} />; if (!player) return null; const handleTagToggle = (tag) => { const isActive = (player.tags || []).includes(tag.id); const newTags = isActive ? player.tags.filter(t => t !== tag.id) : [...(player.tags||[]), tag.id]; onUpdate(player.id, { tags: newTags }); onAddHistory(`${isActive ? 'Gỡ' : 'Gắn'} [${tag.label}] cho ${player.name}`); }; return (<Modal onClose={onClose}><div className="bg-black/50 p-4 flex justify-between items-center border-b border-red-900/30 shrink-0"><h3 className="text-xl font-bold text-white flex items-center gap-2 truncate text-glow"><Settings size={24} className="text-red-500"/>{player.name}</h3><button onClick={onClose} className="text-gray-400 hover:text-red-500 transition-colors p-2"><X /></button></div><div className="p-5 space-y-5 scroll-area flex-1"><div><label className="block text-xs font-bold text-red-500 uppercase mb-2 tracking-wider">Vai Trò</label><select value={player.roleId} onChange={(e) => onUpdate(player.id, { roleId: e.target.value })} className="w-full bg-neutral-800 border border-neutral-700 text-gray-200 rounded-lg p-3 focus:border-red-500 outline-none font-bold">{roles.map(r => (<option key={r.id} value={r.id}>{r.name}</option>))}</select></div>{player.hp !== undefined && (<div><label className="block text-xs font-bold text-red-500 uppercase mb-2 tracking-wider">Mạng Sống</label><div className="flex items-center gap-4 bg-neutral-800 p-2 rounded-lg border border-neutral-700"><button onClick={() => { onUpdate(player.id, { hp: Math.max(0, player.hp - 1) }); onAddHistory(`Trừ HP ${player.name}`); }} className="w-10 h-10 bg-red-900/50 hover:bg-red-800 rounded-lg font-bold text-white border border-red-700 flex items-center justify-center">-</button><span className="text-2xl font-bold text-white flex-1 text-center text-glow">{player.hp}</span><button onClick={() => { onUpdate(player.id, { hp: player.hp + 1 }); onAddHistory(`Cộng HP ${player.name}`); }} className="w-10 h-10 bg-green-900/50 hover:bg-green-800 rounded-lg font-bold text-white border border-green-700 flex items-center justify-center">+</button></div></div>)}<div><div className="flex justify-between items-center mb-2"><label className="block text-xs font-bold text-red-500 uppercase tracking-wider">Trạng Thái</label><button onClick={()=>setShowAddTag(true)} className="text-[10px] bg-neutral-800 border border-neutral-600 px-2 py-1 rounded hover:bg-neutral-700 font-bold">+ THÊM</button></div><div className="grid grid-cols-3 gap-2">{tags.map(tag => { const isActive = (player.tags || []).includes(tag.id); return (<button key={tag.id} onClick={() => handleTagToggle(tag)} className={`py-2 rounded-lg text-xs font-bold border transition-all flex flex-col items-center justify-center gap-1 min-h-[60px] ${isActive ? `${tag.color} border-white` : 'bg-neutral-800 border-neutral-700 text-gray-500'}`}><span className="text-xl">{tag.emoji}</span><span className="text-[9px] tracking-wide text-center">{tag.label}</span></button>); })}</div></div><div className="pt-4 border-t border-red-900/30 shrink-0">{player.isAlive ? (<button onClick={() => { onKill(player.id); onAddHistory(`Khai tử ${player.name}`); onClose(); }} className="btn-normal w-full bg-red-900 hover:bg-red-800 text-white py-3 rounded-xl flex justify-center items-center gap-2 text-lg border border-red-700"><Skull size={20} /> KHAI TỬ</button>) : (<button onClick={() => { onRevive(player.id); onAddHistory(`Hồi sinh ${player.name}`); onClose(); }} className="btn-normal w-full bg-green-900 hover:bg-green-800 text-white py-3 rounded-xl flex justify-center items-center gap-2 text-lg border border-green-700"><RotateCcw size={20} /> HỒI SINH</button>)}</div></div></Modal>); };
 
         const RevealRoleModal = ({ player, roleConfig, onClose }) => { if (!player || !roleConfig) return null; return (<div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={onClose}><div className="bg-neutral-900 rounded-2xl shadow-2xl border-2 border-neutral-700 w-full max-w-sm overflow-hidden relative group max-h-[85vh] flex flex-col" onClick={e => e.stopPropagation()}><div className="absolute inset-0 bg-red-500/5 pointer-events-none"></div><div className="p-8 scroll-area flex-1 flex flex-col items-center text-center animate-fadeIn relative z-10"><h3 className="text-lg text-gray-400 font-bold mb-6 uppercase tracking-[4px] border-b border-red-900/50 pb-2 w-full">Danh tính của {player.name}</h3><div className={`w-32 h-32 rounded-full flex items-center justify-center mb-6 shadow-2xl border-4 ${roleConfig.team === 'bad' ? 'bg-red-950 border-red-600 text-red-500' : (roleConfig.team==='neutral'?'bg-yellow-950 border-yellow-600 text-yellow-500':'bg-blue-950 border-blue-600 text-blue-500')} relative shrink-0`}><div className="absolute inset-0 rounded-full bg-black/20"></div>{roleConfig.icon ? <roleConfig.icon size={60} className="relative z-10 drop-shadow-lg"/> : <Star size={60}/>}</div><h2 className={`text-3xl md:text-4xl mb-4 text-glow tracking-widest font-bold uppercase ${roleConfig.team === 'bad' ? 'text-red-500' : (roleConfig.team === 'neutral' ? 'text-yellow-500' : 'text-blue-500')}`}>{roleConfig.name}</h2><p className="text-gray-300 mb-8 text-lg italic leading-relaxed border-t border-b border-white/5 py-4 w-full bg-black/20">"{roleConfig.desc}"</p><button onClick={onClose} className="btn-normal w-full py-3 bg-neutral-800 hover:bg-neutral-700 text-white rounded-xl border border-neutral-600 flex items-center justify-center gap-2 text-lg tracking-widest transition-all shrink-0"><Check size={24}/> ĐÃ HIỂU</button></div></div></div>) };
+
+        const SetTimeModal = ({ onClose, onSet }) => {
+            const [minutes, setMinutes] = useState(3);
+            return (
+                <Modal onClose={onClose}>
+                    <div className="p-6 text-center">
+                        <h3 className="text-2xl font-bold text-white mb-6 font-title tracking-wider">Cài Đặt Thời Gian</h3>
+                        <div className="flex items-center justify-center gap-6 mb-8">
+                            <button onClick={()=>setMinutes(m=>Math.max(1,m-1))} className="w-12 h-12 rounded-full bg-neutral-800 border border-neutral-600 text-2xl font-bold hover:bg-neutral-700">-</button>
+                            <div className="text-center">
+                                <span className="text-6xl font-mono font-bold text-blue-500">{minutes}</span>
+                                <div className="text-xs text-gray-500 uppercase mt-1 font-bold tracking-widest">Phút</div>
+                            </div>
+                            <button onClick={()=>setMinutes(m=>m+1)} className="w-12 h-12 rounded-full bg-neutral-800 border border-neutral-600 text-2xl font-bold hover:bg-neutral-700">+</button>
+                        </div>
+                        <button onClick={()=>{onSet(minutes*60); onClose();}} className="btn-normal w-full py-3 bg-blue-700 hover:bg-blue-600 rounded-lg text-white shadow-lg shadow-blue-900/50 text-lg tracking-widest">XÁC NHẬN</button>
+                    </div>
+                </Modal>
+            )
+        }
 
         // --- MAIN APP ---
         function App() {
@@ -225,6 +260,7 @@
             const [activeTab, setActiveTab] = useState('control');
             const [editingPlayer, setEditingPlayer] = useState(null);
             const [showAddRole, setShowAddRole] = useState(false);
+            const [showTimeSettings, setShowTimeSettings] = useState(false);
             const [editingRoleConfig, setEditingRoleConfig] = useState(null); 
             const [showDead, setShowDead] = useState(false);
             const [revealId, setRevealId] = useState(null);
@@ -257,7 +293,7 @@
             const removeRole = (id) => { if(confirm("Xóa?")) setRolesConfig(prev => prev.filter(r => r.id !== id)); };
             
             const resetRoles = () => {
-                if(confirm("Khôi phục vai trò chuẩn? (Dân:3, Sói:2...)")) {
+                if(confirm("Khôi phục vai trò chuẩn?")) {
                     const standardRoles = DEFAULT_ROLES.map(role => {
                         let count = 0;
                         if (['villager'].includes(role.id)) count = 3;
@@ -321,7 +357,7 @@
                 return (
                     <div className="h-full w-full flex flex-col p-4 bg-black text-gray-200">
                         <div className="flex-shrink-0 text-center pb-4">
-                             <h1 className="text-4xl md:text-6xl font-spooky text-red-600 text-glow animate-pulse-slow tracking-widest py-4">MA SÓI ULTIMATE</h1>
+                             <h1 className="text-4xl md:text-6xl font-title text-red-600 text-center text-glow animate-pulse-slow tracking-widest py-4">MA SÓI ULTIMATE</h1>
                              <div className="md:hidden flex bg-neutral-900 rounded-lg p-1 border border-neutral-800 mt-2">
                                 <button onClick={() => setSetupTab('names')} className={`flex-1 py-2 rounded-md text-sm font-bold transition-all ${setupTab === 'names' ? 'bg-neutral-800 text-yellow-500 shadow border border-yellow-900/30' : 'text-gray-500'}`}>NHẬP TÊN</button>
                                 <button onClick={() => setSetupTab('roles')} className={`flex-1 py-2 rounded-md text-sm font-bold transition-all ${setupTab === 'roles' ? 'bg-neutral-800 text-blue-500 shadow border border-blue-900/30' : 'text-gray-500'}`}>CHỌN VAI TRÒ</button>
@@ -340,7 +376,7 @@
                                 <div className="flex justify-between items-center mb-2 shrink-0"><h3 className="text-xl md:text-2xl text-blue-500 tracking-wider font-bold">Vai Trò <span className="text-lg">({totalSelected})</span></h3><div className="flex gap-2"><button onClick={resetRoles} className="text-[10px] bg-red-900/50 hover:bg-red-800 border border-red-700 px-2 py-1 rounded font-bold text-red-200 flex items-center gap-1"><Refresh size={12}/> RESET</button><button onClick={()=>setShowAddRole(true)} className="text-[10px] bg-neutral-800 hover:bg-neutral-700 border border-neutral-600 px-2 py-1 rounded font-bold text-gray-300">+ THÊM</button></div></div>
                                 
                                 <div className="flex-1 min-h-0 scroll-area custom-scrollbar pr-1">
-                                    <div className="space-y-2 pb-2">
+                                    <div className="space-y-2 pb-20">
                                         {rolesConfig.map(role => {
                                             const count = role.count ?? role.defaultCount ?? 0;
                                             return (
@@ -374,11 +410,11 @@
                 return (
                     <div className="h-full w-full flex flex-col p-4 bg-black text-gray-200 overflow-hidden">
                          <div className="flex-shrink-0 text-center pt-8 pb-4">
-                            <h2 className="text-4xl font-spooky text-yellow-500 mb-2 text-glow-yellow tracking-widest">PHÁT BÀI</h2>
+                            <h2 className="text-4xl font-title text-yellow-500 mb-2 text-glow-yellow tracking-widest">PHÁT BÀI</h2>
                             <p className="text-gray-500 font-serif italic">"Màn đêm buông xuống..."</p>
                          </div>
                          <div className="flex-1 min-h-0 scroll-area custom-scrollbar pb-20">
-                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-5xl mx-auto">
+                             <div className="grid grid-cols-2 md:grid-cols-4 gap-3 w-full max-w-5xl mx-auto pb-20">
                                 {players.map(p => (
                                     <button key={p.id} onClick={() => setRevealId(p.id)} className="role-card p-3 rounded-xl flex flex-col items-center gap-2 hover:border-yellow-600/50 hover:bg-yellow-900/10 transition-all active:scale-95 relative overflow-hidden h-32 justify-center shrink-0">
                                         <div className="w-10 h-10 bg-black/50 rounded-full border border-neutral-700 flex items-center justify-center text-gray-600 group-hover:text-yellow-500 transition-all shadow-lg"><Users size={20}/></div>
@@ -402,11 +438,12 @@
                 <div className="h-full w-full flex flex-col md:flex-row bg-black overflow-hidden">
                     <div className={`md:w-96 bg-neutral-900/95 border-r border-neutral-800 flex flex-col ${activeTab==='control'?'flex':'hidden md:flex'} relative z-20 shadow-2xl h-full`}>
                         <div className="p-4 text-center border-b border-neutral-800 bg-black/40 shrink-0 relative pt-10 md:pt-4">
-                            <h2 className="text-4xl md:text-5xl font-spooky text-red-600 text-glow tracking-widest mb-1">{phase === 'GAME_NIGHT' ? `ĐÊM THỨ ${dayCount}` : `NGÀY THỨ ${dayCount}`}</h2>
+                            <h2 className="text-4xl md:text-5xl font-title text-red-600 text-glow tracking-widest mb-1">{phase === 'GAME_NIGHT' ? `ĐÊM THỨ ${dayCount}` : `NGÀY THỨ ${dayCount}`}</h2>
                             <button onClick={endGame} className="btn-normal absolute top-4 left-4 text-[10px] border border-gray-800 px-2 py-1 rounded text-gray-600 hover:text-red-500 hover:border-red-900 transition-colors uppercase">Thoát</button>
                         </div>
                         
                         <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-6 scroll-area custom-scrollbar pb-32 md:pb-20">
+                             {/* History */}
                              {history.length > 0 && (
                                 <div className="bg-black/40 border border-neutral-800 rounded-lg p-3 max-h-40 overflow-y-auto text-xs custom-scrollbar">
                                     <div className="flex items-center gap-1 text-gray-500 font-bold mb-2 uppercase tracking-wider sticky top-0 bg-black/90 p-1"><HistoryIcon size={12}/> Lịch Sử</div>
@@ -419,7 +456,7 @@
                             {phase === 'GAME_NIGHT' ? (
                                 <div className="space-y-6 animate-fadeIn">
                                     <div className="text-center">
-                                        <div className="text-3xl font-bold text-white mb-2 font-spooky tracking-wider text-glow">{currentStep.title}</div>
+                                        <div className="text-3xl font-bold text-white mb-2 font-title tracking-wider text-glow">{currentStep.title}</div>
                                         <div className="text-emerald-400 italic text-base font-serif bg-emerald-900/10 py-2 rounded-lg border border-emerald-900/30">"{currentStep.msg}"</div>
                                     </div>
                                     {hintIds.length > 0 && <div className="bg-blue-950/30 border border-blue-900/50 p-3 rounded-xl text-center shadow-inner"><div className="text-[10px] text-blue-400 uppercase font-bold mb-2 tracking-[2px]">Người giữ vai trò</div><div className="flex flex-wrap justify-center gap-2">{players.filter(p => hintIds.includes(p.id)).map(p => (<span key={p.id} className={`text-xs font-bold px-2 py-1 rounded border ${p.isAlive ? 'bg-blue-900/50 border-blue-700 text-white' : 'bg-neutral-800 border-neutral-700 text-gray-600 line-through'}`}>{p.name}</span>))}</div></div>}
@@ -427,7 +464,8 @@
                                 </div>
                             ) : (
                                 <div className="space-y-6 animate-fadeIn">
-                                    <div className="role-card p-4 rounded-2xl text-center border-neutral-800">
+                                    <div className="role-card p-4 rounded-2xl text-center border-neutral-800 relative">
+                                        <button onClick={()=>setShowTimeSettings(true)} className="absolute top-2 right-2 text-gray-600 hover:text-white p-2"><Settings size={16}/></button>
                                         <div className={`text-5xl font-mono font-bold tracking-tighter ${timer<10?'text-red-500 animate-pulse':''}`}>{Math.floor(timer/60)}:{(timer%60).toString().padStart(2,'0')}</div>
                                         <div className="flex justify-center gap-4 mt-4"><button onClick={()=>setIsTimerRunning(!isTimerRunning)} className="w-10 h-10 bg-neutral-800 border border-neutral-700 rounded-full flex items-center justify-center hover:text-white text-gray-400 active:scale-95">{isTimerRunning ? <Pause size={20}/> : <Play size={20}/>}</button><button onClick={()=>{setTimer(120);setIsTimerRunning(false)}} className="w-10 h-10 bg-neutral-800 border border-neutral-700 rounded-full flex items-center justify-center hover:text-white text-gray-400 active:scale-95"><RotateCcw size={20}/></button></div>
                                     </div>
@@ -443,7 +481,7 @@
                     </div>
                     
                     <div className={`flex-1 min-h-0 overflow-y-auto p-4 ${activeTab==='players'?'block':'hidden md:block'} pb-24 md:pb-6 custom-scrollbar scroll-area`}>
-                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 relative z-10">
+                        <div className="grid grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 relative z-10 pb-20">
                             {players.filter(p=>showDead||p.isAlive).map(p => {
                                 const r = rolesConfig.find(x=>x.id===p.roleId);
                                 const isDead = !p.isAlive;
@@ -464,11 +502,14 @@
                             })}
                         </div>
                     </div>
+                    
                     <div className="md:hidden fixed bottom-0 w-full flex bg-neutral-900/95 backdrop-blur border-t border-neutral-800 z-50 pb-safe">
                         <button onClick={()=>setActiveTab('control')} className={`btn-normal flex-1 py-3 text-xs tracking-widest ${activeTab==='control'?'text-red-500 bg-red-900/10':'text-gray-500'}`}>ĐIỀU KHIỂN</button>
                         <button onClick={()=>setActiveTab('players')} className={`btn-normal flex-1 py-3 text-xs tracking-widest ${activeTab==='players'?'text-red-500 bg-red-900/10':'text-gray-500'}`}>DANH SÁCH</button>
                     </div>
+
                     {editingPlayer && <PlayerActionModal player={editingPlayer} roles={rolesConfig} tags={statusTags} onAddTag={addCustomTag} onAddHistory={addToHistory} onClose={() => setEditingPlayer(null)} onUpdate={(id, data) => setPlayers(prev => prev.map(p => p.id === id ? { ...p, ...data } : p))} onKill={(id) => setPlayers(prev => prev.map(p => p.id === id ? { ...p, isAlive: false } : p))} onRevive={(id) => setPlayers(prev => prev.map(p => p.id === id ? { ...p, isAlive: true } : p))} />}
+                    {showTimeSettings && <SetTimeModal onClose={()=>setShowTimeSettings(false)} onSet={(s)=>{setTimer(s); setIsTimerRunning(false);}} />}
                 </div>
             );
         }
