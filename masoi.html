@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quản Trò Ma Sói Ultimate</title>
+    <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Creepster&family=Roboto:wght@300;400;700&display=swap');
+        
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: #121212;
+            color: #e5e5e5;
+            overscroll-behavior: none;
+        }
+        
+        .font-spooky {
+            font-family: 'Creepster', cursive;
+        }
+
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-track { background: #1f1f1f; }
+        ::-webkit-scrollbar-thumb { background: #444; border-radius: 2px; }
+        
+        .modal-backdrop {
+            background-color: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(4px);
+        }
+
+        /* Mobile Tab Bar */
+        .tab-active {
+            border-bottom: 2px solid #ef4444;
+            color: #ef4444;
+        }
+        .tab-inactive {
+            color: #6b7280;
+        }
+        
+        .animate-pulse-slow {
+            animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo, useRef } = React;
+
+        // --- ICONS ---
+        const IconBase = ({ children, size = 20, className = "", onClick }) => (
+            <svg onClick={onClick} xmlns="http://www.w3.org/2000/svg" width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className={className}>
+                {children}
+            </svg>
+        );
+
+        const Moon = (p) => <IconBase {...p}><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/></IconBase>;
+        const Sun = (p) => <IconBase {...p}><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></IconBase>;
+        const Users = (p) => <IconBase {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></IconBase>;
+        const Eye = (p) => <IconBase {...p}><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></IconBase>;
+        const Shield = (p) => <IconBase {...p}><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10"/></IconBase>;
+        const Flask = (p) => <IconBase {...p}><path d="M10 2v7.527a2 2 0 0 1-.211.896L4.72 20.55a1 1 0 0 0 .9 1.45h12.76a1 1 0 0 0 .9-1.45l-5.069-10.127A2 2 0 0 1 14 9.527V2"/><path d="M8.5 2h7"/><path d="M7 16h10"/></IconBase>;
+        const Gavel = (p) => <IconBase {...p}><path d="m14.5 12.5-8 8a2.121 2.121 0 0 1-3-3l8-8"/><path d="m16 16 6-6"/><path d="m8 8 6-6"/><path d="m9 7 8 8"/><path d="m21 11-8-8"/></IconBase>;
+        const Heart = (p) => <IconBase {...p}><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></IconBase>;
+        const Ghost = (p) => <IconBase {...p}><path d="M9 22v-3h6v3" /><path d="M4 22V9a8 8 0 0 1 16 0v13" /><circle cx="9" cy="10" r="1.5" /><circle cx="15" cy="10" r="1.5" /><path d="M10 16a2 2 0 1 0 4 0" /></IconBase>;
+        const Star = (p) => <IconBase {...p}><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></IconBase>;
+        const PawPrint = (p) => <IconBase {...p}><circle cx="12" cy="12" r="3"/><circle cx="19" cy="5" r="3"/><circle cx="5" cy="5" r="3"/><circle cx="19" cy="19" r="3"/><circle cx="5" cy="19" r="3"/></IconBase>;
+        const UserX = (p) => <IconBase {...p}><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="18" x2="23" y1="8" y2="13"/><line x1="23" x2="18" y1="8" y2="13"/></IconBase>;
+        const Settings = (p) => <IconBase {...p}><path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.09a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/><circle cx="12" cy="12" r="3"/></IconBase>;
+        const Skull = (p) => <IconBase {...p}><circle cx="9" cy="12" r="1"/><circle cx="15" cy="12" r="1"/><path d="M8 20v2h8v-2"/><path d="m12.5 17-.5-1-.5 1h1z"/><path d="M16 20a2 2 0 0 0 1.56-3.25 8 8 0 1 0-11.12 0A2 2 0 0 0 8 20"/></IconBase>;
+        const Play = (p) => <IconBase {...p}><polygon points="5 3 19 12 5 21 5 3"/></IconBase>;
+        const Pause = (p) => <IconBase {...p}><rect width="4" height="16" x="6" y="4"/><rect width="4" height="16" x="14" y="4"/></IconBase>;
+        const RotateCcw = (p) => <IconBase {...p}><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></IconBase>;
+        const X = (p) => <IconBase {...p}><path d="M18 6 6 18"/><path d="m6 6 18 18"/></IconBase>;
+        const List = (p) => <IconBase {...p}><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></IconBase>;
+        const SkipForward = (p) => <IconBase {...p}><polygon points="5 4 15 12 5 20 5 4"/><line x1="19" x2="19" y1="5" y2="19"/></IconBase>;
+        const Clock = (p) => <IconBase {...p}><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></IconBase>;
+        const Save = (p) => <IconBase {...p}><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></IconBase>;
+        const Plus = (p) => <IconBase {...p}><path d="M5 12h14"/><path d="M12 5v14"/></IconBase>;
+
+        // --- CONSTANTS ---
+        const DEFAULT_ROLES = [
+            { id: 'villager', name: 'Dân Làng', team: 'good', defaultCount: 3, icon: Users, desc: 'Không có chức năng đặc biệt.' },
+            { id: 'werewolf', name: 'Ma Sói', team: 'bad', defaultCount: 2, icon: Moon, desc: 'Dậy đêm cắn người.' },
+            { id: 'seer', name: 'Tiên Tri', team: 'good', defaultCount: 1, icon: Eye, desc: 'Soi phe của 1 người mỗi đêm.' },
+            { id: 'bodyguard', name: 'Bảo Vệ', team: 'good', defaultCount: 1, icon: Shield, desc: 'Bảo vệ 1 người (không lặp lại 2 đêm).' },
+            { id: 'witch', name: 'Phù Thủy', team: 'good', defaultCount: 1, icon: Flask, desc: '1 Bình Cứu, 1 Bình Độc.' },
+            { id: 'hunter', name: 'Thợ Săn', team: 'good', defaultCount: 0, icon: Gavel, desc: 'Kéo theo 1 người khi chết.' },
+            { id: 'cupid', name: 'Thần Tình Yêu', team: 'good', defaultCount: 0, icon: Heart, desc: 'Ghép đôi 2 người đêm đầu tiên.' },
+            { id: 'elder', name: 'Già Làng', team: 'good', defaultCount: 0, icon: Star, desc: 'Có 2 mạng khi bị sói cắn.', hp: 2 },
+            { id: 'lycan', name: 'Bán Sói', team: 'good', defaultCount: 0, icon: PawPrint, desc: 'Dân làng, hóa Sói nếu bị cắn.' },
+            { id: 'minion', name: 'Phản Bội', team: 'bad', defaultCount: 0, icon: UserX, desc: 'Phe Sói, thức dậy riêng, không cắn.' },
+            { id: 'jester', name: 'Kẻ Chán Đời', team: 'neutral', defaultCount: 0, icon: Ghost, desc: 'Thắng nếu bị treo cổ.' },
+        ];
+
+        const STATUS_TAGS = [
+            { id: 'love', label: 'Yêu', emoji: '❤️', color: 'bg-pink-500' },
+            { id: 'silenced', label: 'Câm', emoji: '🤐', color: 'bg-gray-500' },
+            { id: 'protected', label: 'Shield', emoji: '🛡️', color: 'bg-blue-500' },
+            { id: 'target', label: 'Target', emoji: '🎯', color: 'bg-red-500' },
+            { id: 'poisoned', label: 'Độc', emoji: '🤢', color: 'bg-green-600' },
+            { id: 'bitten', label: 'Cắn', emoji: '🐺', color: 'bg-red-900' },
+        ];
+
+        const NIGHT_STEPS_DEF = [
+            { id: 'start', title: 'Đêm xuống', msg: 'Tất cả nhắm mắt lại.' },
+            { id: 'cupid', title: 'Thần Tình Yêu', msg: 'Dậy ghép đôi nào.', roleId: 'cupid', limit: 1 },
+            { id: 'lovers', title: 'Cặp Đôi', msg: 'Hai người yêu nhau mở mắt nhìn nhau.', roleId: 'cupid', limit: 1, dependency: true }, // Dependent on Cupid existing
+            { id: 'guard', title: 'Bảo Vệ', msg: 'Bạn muốn bảo vệ ai?', roleId: 'bodyguard' },
+            { id: 'werewolf', title: 'Ma Sói', msg: 'Đêm nay cắn ai?', roleId: 'werewolf' },
+            { id: 'minion', title: 'Phản Bội', msg: 'Dậy tìm đồng đội.', roleId: 'minion', limit: 1 },
+            { id: 'witch', title: 'Phù Thủy', msg: 'Có cứu hay giết ai không?', roleId: 'witch' },
+            { id: 'seer', title: 'Tiên Tri', msg: 'Bạn muốn soi ai?', roleId: 'seer' },
+            { id: 'elder', title: 'Già Làng', msg: 'Gọi để xác nhận trạng thái.', roleId: 'elder' },
+            { id: 'end', title: 'Trời sáng', msg: 'Mọi người thức dậy!' }
+        ];
+
+        // --- COMPONENTS ---
+
+        const PlayerActionModal = ({ player, roles, onClose, onUpdate, onKill, onRevive }) => {
+            if (!player) return null;
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={onClose}>
+                    <div className="bg-neutral-800 rounded-xl shadow-2xl border border-neutral-600 w-full max-w-sm overflow-hidden animate-fadeIn" onClick={e => e.stopPropagation()}>
+                        <div className="bg-neutral-900 p-4 flex justify-between items-center border-b border-neutral-700">
+                            <h3 className="text-lg font-bold text-white flex items-center gap-2 truncate">
+                                <Settings size={18} className="text-blue-400"/>
+                                {player.name}
+                            </h3>
+                            <button onClick={onClose} className="text-gray-400 hover:text-white"><X /></button>
+                        </div>
+
+                        <div className="p-4 space-y-4 max-h-[70vh] overflow-y-auto">
+                            {/* Role Change */}
+                            <div>
+                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Đổi Vai Trò</label>
+                                <select 
+                                    value={player.roleId} 
+                                    onChange={(e) => onUpdate(player.id, { roleId: e.target.value })}
+                                    className="w-full bg-black/40 border border-neutral-600 text-white rounded p-2 focus:border-blue-500 text-sm"
+                                >
+                                    {roles.map(r => (
+                                        <option key={r.id} value={r.id}>
+                                            {r.name} {r.count > 0 ? '(Trong Game)' : ''}
+                                        </option>
+                                    ))}
+                                </select>
+                            </div>
+
+                            {/* HP */}
+                            {player.hp !== undefined && (
+                                <div>
+                                    <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Mạng Sống</label>
+                                    <div className="flex items-center gap-4 bg-black/20 p-2 rounded">
+                                        <button onClick={() => onUpdate(player.id, { hp: Math.max(0, player.hp - 1) })} className="w-8 h-8 bg-red-900 rounded font-bold">-</button>
+                                        <span className="text-xl font-bold text-white flex-1 text-center">{player.hp}</span>
+                                        <button onClick={() => onUpdate(player.id, { hp: player.hp + 1 })} className="w-8 h-8 bg-green-900 rounded font-bold">+</button>
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Tags */}
+                            <div>
+                                <label className="block text-[10px] font-bold text-gray-400 uppercase mb-1">Trạng Thái</label>
+                                <div className="grid grid-cols-3 gap-2">
+                                    {STATUS_TAGS.map(tag => {
+                                        const isActive = (player.tags || []).includes(tag.id);
+                                        return (
+                                            <button
+                                                key={tag.id}
+                                                onClick={() => {
+                                                    const newTags = isActive ? player.tags.filter(t => t !== tag.id) : [...(player.tags||[]), tag.id];
+                                                    onUpdate(player.id, { tags: newTags });
+                                                }}
+                                                className={`py-1.5 rounded-lg text-xs font-bold border transition-all flex flex-col items-center justify-center gap-1
+                                                    ${isActive ? `${tag.color} text-white border-transparent` : 'bg-transparent border-neutral-700 text-gray-500 hover:border-gray-500'}`}
+                                            >
+                                                <span className="text-sm">{tag.emoji}</span>
+                                                <span className="text-[10px]">{tag.label}</span>
+                                            </button>
+                                        );
+                                    })}
+                                </div>
+                            </div>
+
+                            {/* Kill/Revive */}
+                            <div className="pt-2 border-t border-neutral-700">
+                                {player.isAlive ? (
+                                    <button onClick={() => { onKill(player.id); onClose(); }} className="w-full bg-red-900/80 hover:bg-red-700 text-white py-3 rounded-lg font-bold flex justify-center items-center gap-2">
+                                        <Skull size={18} /> KHAI TỬ
+                                    </button>
+                                ) : (
+                                    <button onClick={() => { onRevive(player.id); onClose(); }} className="w-full bg-green-900/80 hover:bg-green-700 text-white py-3 rounded-lg font-bold flex justify-center items-center gap-2">
+                                        <RotateCcw size={18} /> HỒI SINH
+                                    </button>
+                                )}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const AddRoleModal = ({ onClose, onAdd }) => {
+            const [name, setName] = useState("");
+            const [desc, setDesc] = useState("");
+            const [team, setTeam] = useState("good");
+            return (
+                <div className="fixed inset-0 z-50 flex items-center justify-center modal-backdrop p-4" onClick={onClose}>
+                    <div className="bg-neutral-800 rounded-xl border border-neutral-600 w-full max-w-sm p-4" onClick={e=>e.stopPropagation()}>
+                        <h3 className="text-lg font-bold text-white mb-4">Thêm Vai Trò Mới</h3>
+                        <input className="w-full mb-3 bg-neutral-900 border border-neutral-600 rounded p-2 text-white" placeholder="Tên vai trò (VD: Sói Lửa)" value={name} onChange={e=>setName(e.target.value)} />
+                        <select className="w-full mb-3 bg-neutral-900 border border-neutral-600 rounded p-2 text-white" value={team} onChange={e=>setTeam(e.target.value)}>
+                            <option value="good">Phe Dân</option>
+                            <option value="bad">Phe Sói</option>
+                            <option value="neutral">Phe Thứ 3</option>
+                        </select>
+                        <input className="w-full mb-4 bg-neutral-900 border border-neutral-600 rounded p-2 text-white" placeholder="Mô tả ngắn..." value={desc} onChange={e=>setDesc(e.target.value)} />
+                        <div className="flex gap-2">
+                            <button onClick={onClose} className="flex-1 py-2 bg-gray-700 rounded text-gray-300">Hủy</button>
+                            <button onClick={() => { if(name) { onAdd({name, desc, team}); onClose(); } }} className="flex-1 py-2 bg-blue-600 rounded text-white font-bold">Thêm</button>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+        function App() {
+            // Initial State from LocalStorage
+            const [phase, setPhase] = useState('SETUP'); 
+            const [rolesConfig, setRolesConfig] = useState(() => {
+                const saved = localStorage.getItem('rolesConfig');
+                return saved ? JSON.parse(saved) : DEFAULT_ROLES;
+            });
+            const [playerNamesInput, setPlayerNamesInput] = useState(() => {
+                return localStorage.getItem('playerNamesInput') || "Tí\nSửu\nDần\nMão\nThìn\nTị\nNgọ\nMùi";
+            });
+            
+            // Auto-Save
+            useEffect(() => {
+                localStorage.setItem('rolesConfig', JSON.stringify(rolesConfig));
+                localStorage.setItem('playerNamesInput', playerNamesInput);
+            }, [rolesConfig, playerNamesInput]);
+
+            // Game State
+            const [players, setPlayers] = useState([]);
+            const [dayCount, setDayCount] = useState(1);
+            const [currentStepIdx, setCurrentStepIdx] = useState(0);
+            const [timer, setTimer] = useState(120);
+            const [isTimerRunning, setIsTimerRunning] = useState(false);
+            const [gameLog, setGameLog] = useState([]);
+            
+            // UI State
+            const [activeTab, setActiveTab] = useState('control');
+            const [editingPlayer, setEditingPlayer] = useState(null);
+            const [showAddRole, setShowAddRole] = useState(false);
+            const [showDead, setShowDead] = useState(false);
+            
+            // Generate Night Steps
+            const activeNightSteps = useMemo(() => {
+                if (phase === 'SETUP') return [];
+                const activeRoleIds = new Set(rolesConfig.filter(r => (r.count || 0) > 0).map(r => r.id));
+                players.forEach(p => activeRoleIds.add(p.roleId));
+                return NIGHT_STEPS_DEF.filter(step => {
+                    if (step.id === 'start' || step.id === 'end') return true;
+                    if (step.limit && dayCount > step.limit) return false;
+                    if (step.dependency && !activeRoleIds.has('cupid')) return false;
+                    if (step.roleId && !activeRoleIds.has(step.roleId)) return false;
+                    return true;
+                });
+            }, [phase, rolesConfig, players, dayCount]);
+
+            // Helpers
+            const totalPlayers = playerNamesInput.split('\n').filter(n=>n.trim()).length;
+            const totalSelected = rolesConfig.reduce((acc,r) => acc + (r.count||r.defaultCount||0), 0);
+
+            const updateRoleCount = (id, delta) => {
+                setRolesConfig(prev => prev.map(r => r.id === id ? { ...r, count: Math.max(0, (r.count??r.defaultCount) + delta) } : r));
+            };
+
+            const startGame = () => {
+                if (totalSelected !== totalPlayers) {
+                    alert(`Số lượng không khớp: ${totalSelected} vai trò / ${totalPlayers} người chơi.`);
+                    return;
+                }
+                
+                let pool = [];
+                rolesConfig.forEach(r => {
+                    const c = r.count ?? r.defaultCount;
+                    for(let i=0; i<c; i++) pool.push(r.id);
+                });
+                for (let i = pool.length - 1; i > 0; i--) {
+                    const j = Math.floor(Math.random() * (i + 1));
+                    [pool[i], pool[j]] = [pool[j], pool[i]];
+                }
+
+                const names = playerNamesInput.split('\n').filter(n=>n.trim());
+                const newPlayers = names.map((name, idx) => {
+                    const roleId = pool[idx];
+                    const roleDef = rolesConfig.find(r => r.id === roleId);
+                    return {
+                        id: idx + 1, name, roleId, originalRoleId: roleId,
+                        isAlive: true, tags: [], note: '', hp: roleDef.hp || 1
+                    };
+                });
+
+                setPlayers(newPlayers);
+                setPhase('GAME_NIGHT');
+                setDayCount(1);
+                setCurrentStepIdx(0);
+                setActiveTab('control');
+                setGameLog(["[System] Game Start!"]);
+            };
+
+            const endGame = () => {
+                if(confirm("Kết thúc game và trở về màn hình chính? (Setup sẽ được giữ nguyên)")) {
+                    setPhase('SETUP');
+                }
+            };
+
+            // Game Logic
+            const nextStep = () => {
+                if (currentStepIdx < activeNightSteps.length - 1) {
+                    setCurrentStepIdx(prev => prev + 1);
+                } else {
+                    setPhase('GAME_DAY');
+                    setTimer(180); // Default 3 mins
+                    setIsTimerRunning(false);
+                    setGameLog(p => [`--- NGÀY THỨ ${dayCount} ---`, ...p]);
+                }
+            };
+
+            const endDay = () => {
+                if(confirm("Chuyển sang Đêm?")) {
+                    setPhase('GAME_NIGHT');
+                    setDayCount(p => p + 1);
+                    setCurrentStepIdx(0);
+                    setGameLog(p => [`--- ĐÊM THỨ ${dayCount + 1} ---`, ...p]);
+                }
+            };
+
+            // Identify Victims for Morning Report
+            const victims = useMemo(() => {
+                return players.filter(p => p.isAlive && p.tags && (p.tags.includes('bitten') || p.tags.includes('poisoned')));
+            }, [players]);
+
+            // Timer Logic
+            useEffect(() => {
+                let interval;
+                if (isTimerRunning && timer > 0) interval = setInterval(() => setTimer(t => t - 1), 1000);
+                return () => clearInterval(interval);
+            }, [isTimerRunning, timer]);
+
+            const adjustTime = (seconds) => setTimer(t => t + seconds);
+            const skipTimer = () => {
+                setTimer(0);
+                setIsTimerRunning(false);
+            };
+
+            // --- RENDER ---
+            if (phase === 'SETUP') {
+                return (
+                    <div className="min-h-screen bg-neutral-900 text-gray-200 p-4 md:p-8 flex justify-center">
+                        <div className="w-full max-w-4xl space-y-6">
+                            <h1 className="text-4xl font-spooky text-red-600 text-center drop-shadow-lg">MA SÓI GM TOOL</h1>
+                            
+                            <div className="grid md:grid-cols-2 gap-6">
+                                <div className="bg-neutral-800 p-4 rounded-xl border border-neutral-700">
+                                    <div className="flex justify-between mb-2">
+                                        <label className="font-bold text-yellow-500">Danh Sách ({totalPlayers})</label>
+                                        <span className="text-xs text-gray-500 flex items-center gap-1"><Save size={12}/> Auto-saved</span>
+                                    </div>
+                                    <textarea 
+                                        className="w-full h-64 bg-neutral-900 border border-neutral-600 rounded p-3 text-sm focus:border-red-500 outline-none"
+                                        value={playerNamesInput}
+                                        onChange={e => setPlayerNamesInput(e.target.value)}
+                                        placeholder="Nhập tên người chơi..."
+                                    />
+                                </div>
+
+                                <div className="bg-neutral-800 p-4 rounded-xl border border-neutral-700 flex flex-col h-[500px]">
+                                    <div className="flex justify-between mb-4 items-center">
+                                        <label className="font-bold text-blue-400">Vai Trò ({totalSelected}/{totalPlayers})</label>
+                                        <button onClick={()=>setShowAddRole(true)} className="text-xs bg-neutral-700 hover:bg-neutral-600 px-2 py-1 rounded border border-neutral-500">+ Thêm Mới</button>
+                                    </div>
+                                    <div className="flex-1 overflow-y-auto space-y-2 pr-1 custom-scrollbar">
+                                        {rolesConfig.map(role => {
+                                            const count = role.count ?? role.defaultCount ?? 0;
+                                            return (
+                                                <div key={role.id} className="flex justify-between items-center bg-neutral-700/50 p-2 rounded">
+                                                    <div className="flex items-center gap-2 overflow-hidden">
+                                                        <div className={`w-6 h-6 rounded-full flex items-center justify-center shrink-0 ${role.team === 'bad' ? 'bg-red-900 text-red-200' : (role.team==='neutral'?'bg-yellow-800 text-yellow-200':'bg-blue-900 text-blue-200')}`}>
+                                                            {role.icon ? <role.icon size={12}/> : <Star size={12}/>}
+                                                        </div>
+                                                        <div className="truncate">
+                                                            <div className="font-bold text-sm">{role.name}</div>
+                                                        </div>
+                                                    </div>
+                                                    <div className="flex items-center gap-2 shrink-0">
+                                                        <button onClick={()=>updateRoleCount(role.id, -1)} className="w-6 h-6 bg-neutral-600 rounded flex items-center justify-center">-</button>
+                                                        <span className="w-4 text-center text-sm font-bold">{count}</span>
+                                                        <button onClick={()=>updateRoleCount(role.id, 1)} className="w-6 h-6 bg-neutral-600 rounded flex items-center justify-center">+</button>
+                                                    </div>
+                                                </div>
+                                            )
+                                        })}
+                                    </div>
+                                    <button 
+                                        onClick={startGame}
+                                        disabled={totalSelected !== totalPlayers}
+                                        className={`mt-4 w-full py-3 rounded font-bold uppercase ${totalSelected === totalPlayers ? 'bg-red-700 text-white shadow-lg shadow-red-900/40' : 'bg-neutral-700 text-gray-500'}`}
+                                    >
+                                        BẮT ĐẦU GAME
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {showAddRole && (
+                            <AddRoleModal 
+                                onClose={()=>setShowAddRole(false)} 
+                                onAdd={(newRole) => {
+                                    setRolesConfig(prev => [...prev, {
+                                        id: `custom_${Date.now()}`,
+                                        name: newRole.name, team: newRole.team, desc: newRole.desc,
+                                        count: 1, defaultCount: 0, icon: Star
+                                    }]);
+                                }} 
+                            />
+                        )}
+                    </div>
+                );
+            }
+
+            // GAME UI
+            const currentStep = activeNightSteps[currentStepIdx] || {};
+            const hintPlayers = (phase === 'GAME_NIGHT' && currentStep.roleId) 
+                ? players.filter(p => p.roleId === currentStep.roleId) 
+                : [];
+            const visiblePlayers = players.filter(p => showDead || p.isAlive);
+
+            return (
+                <div className="min-h-screen bg-neutral-900 flex flex-col md:flex-row overflow-hidden">
+                    {/* MOBILE TAB BAR */}
+                    <div className="md:hidden flex bg-neutral-800 border-b border-neutral-700 z-10">
+                        <button onClick={() => setActiveTab('control')} className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${activeTab === 'control' ? 'tab-active' : 'tab-inactive'}`}>
+                            {phase === 'GAME_NIGHT' ? <Moon size={16}/> : <Sun size={16}/>} Điều Khiển
+                        </button>
+                        <button onClick={() => setActiveTab('players')} className={`flex-1 py-3 text-sm font-bold flex items-center justify-center gap-2 ${activeTab === 'players' ? 'tab-active' : 'tab-inactive'}`}>
+                            <List size={16}/> Người Chơi
+                        </button>
+                    </div>
+
+                    {/* CONTROL PANEL */}
+                    <div className={`md:w-96 bg-neutral-800 md:border-r border-neutral-700 flex-col md:flex ${activeTab === 'control' ? 'flex flex-1' : 'hidden md:flex'}`}>
+                        <div className="p-4 text-center border-b border-neutral-700 relative">
+                            <h2 className="text-2xl font-spooky text-red-500">{phase === 'GAME_NIGHT' ? `ĐÊM THỨ ${dayCount}` : `NGÀY THỨ ${dayCount}`}</h2>
+                            <button onClick={endGame} className="absolute top-4 left-4 text-xs text-gray-500 hover:text-white border border-gray-600 px-2 py-1 rounded">Kết Thúc</button>
+                        </div>
+                        
+                        <div className="flex-1 p-6 flex flex-col justify-center overflow-y-auto">
+                            {phase === 'GAME_NIGHT' ? (
+                                <div className="animate-fadeIn space-y-6">
+                                    <div className="text-center">
+                                        <h3 className="text-3xl font-bold text-white mb-2">{currentStep.title}</h3>
+                                        <p className="text-emerald-400 italic text-xl">"{currentStep.msg}"</p>
+                                    </div>
+                                    {hintPlayers.length > 0 && (
+                                        <div className="bg-blue-900/20 border border-blue-800 p-3 rounded-lg text-center">
+                                            <div className="text-xs text-blue-400 uppercase font-bold mb-2">Vai Trò Này:</div>
+                                            <div className="flex flex-wrap justify-center gap-2">
+                                                {hintPlayers.map(p => (
+                                                    <span key={p.id} className={`text-xs px-2 py-1 rounded font-bold ${p.isAlive ? 'bg-blue-600 text-white' : 'bg-gray-700 text-gray-400 line-through'}`}>{p.name}</span>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    <button onClick={nextStep} className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white rounded-xl font-bold text-lg shadow-lg flex items-center justify-center gap-2">
+                                        Tiếp Tục <Play size={20} fill="currentColor"/>
+                                    </button>
+                                </div>
+                            ) : (
+                                <div className="flex flex-col items-center gap-6 animate-fadeIn w-full">
+                                    {/* TIMER */}
+                                    <div className="flex flex-col items-center w-full">
+                                        <div className={`text-7xl font-mono font-bold ${timer < 10 ? 'text-red-500 animate-pulse' : 'text-white'}`}>
+                                            {Math.floor(timer/60)}:{(timer%60).toString().padStart(2,'0')}
+                                        </div>
+                                        
+                                        <div className="flex gap-4 mt-4 mb-2">
+                                            <button onClick={() => setIsTimerRunning(!isTimerRunning)} className="w-12 h-12 rounded-full bg-neutral-700 flex items-center justify-center text-white hover:bg-neutral-600">
+                                                {isTimerRunning ? <Pause size={20}/> : <Play size={20}/>}
+                                            </button>
+                                            <button onClick={() => {setTimer(180); setIsTimerRunning(false);}} className="w-12 h-12 rounded-full bg-neutral-700 flex items-center justify-center text-white hover:bg-neutral-600">
+                                                <RotateCcw size={20} />
+                                            </button>
+                                        </div>
+
+                                        <div className="flex gap-2 w-full px-4 justify-center">
+                                            <button onClick={()=>adjustTime(60)} className="px-3 py-1 bg-neutral-700 rounded text-xs font-bold hover:bg-neutral-600 flex items-center gap-1"><Plus size={12}/> 1 Phút</button>
+                                            <button onClick={()=>adjustTime(30)} className="px-3 py-1 bg-neutral-700 rounded text-xs font-bold hover:bg-neutral-600 flex items-center gap-1"><Plus size={12}/> 30s</button>
+                                            <button onClick={skipTimer} className="px-3 py-1 bg-red-900/50 text-red-300 rounded text-xs font-bold hover:bg-red-900 flex items-center gap-1"><SkipForward size={12}/> Bỏ Qua</button>
+                                        </div>
+                                    </div>
+
+                                    {/* MORNING REPORT / VICTIMS */}
+                                    {victims.length > 0 && (
+                                        <div className="w-full bg-red-900/20 border border-red-900/50 rounded-xl p-3 animate-pulse-slow">
+                                            <div className="text-xs font-bold text-red-400 uppercase mb-2 flex items-center gap-2">
+                                                <Skull size={14}/> Nạn nhân đêm qua
+                                            </div>
+                                            <div className="space-y-2">
+                                                {victims.map(p => (
+                                                    <div key={p.id} className="flex justify-between items-center bg-black/40 p-2 rounded">
+                                                        <div className="flex items-center gap-2">
+                                                            <span className="font-bold">{p.name}</span>
+                                                            <div className="flex gap-1">
+                                                                {p.tags.includes('bitten') && <span className="text-xs">🐺</span>}
+                                                                {p.tags.includes('poisoned') && <span className="text-xs">🤢</span>}
+                                                            </div>
+                                                        </div>
+                                                        <button 
+                                                            onClick={() => {
+                                                                if(confirm(`Khai tử ${p.name}?`)) {
+                                                                    setPlayers(prev => prev.map(pl => pl.id === p.id ? { ...pl, isAlive: false } : pl));
+                                                                    setGameLog(prev => [`${p.name} đã bị loại.`, ...prev]);
+                                                                }
+                                                            }}
+                                                            className="bg-red-600 hover:bg-red-500 text-white text-[10px] font-bold px-2 py-1 rounded"
+                                                        >
+                                                            KHAI TỬ
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+
+                                    <button onClick={endDay} className="mt-2 w-full py-3 border border-blue-800 text-blue-400 hover:bg-blue-900/30 rounded-lg font-bold">
+                                        Vào Ban Đêm
+                                    </button>
+                                </div>
+                            )}
+                        </div>
+                        
+                        {/* Log */}
+                        <div className="h-32 bg-black/40 p-3 overflow-y-auto text-xs font-mono text-gray-500 border-t border-neutral-700">
+                            {gameLog.map((l,i) => <div key={i} className="mb-1">{l}</div>)}
+                        </div>
+                    </div>
+
+                    {/* PLAYERS LIST */}
+                    <div className={`flex-1 bg-neutral-900 p-4 overflow-y-auto md:flex flex-col ${activeTab === 'players' ? 'flex' : 'hidden md:flex'}`}>
+                        <div className="flex justify-between items-center mb-4 sticky top-0 bg-neutral-900 z-10 py-2">
+                            <h2 className="text-xl font-bold text-gray-200">Người Chơi</h2>
+                            <div className="flex items-center gap-3">
+                                <label className="flex items-center gap-2 text-xs text-gray-400 bg-neutral-800 px-3 py-1.5 rounded-full border border-neutral-700">
+                                    <input type="checkbox" checked={showDead} onChange={e=>setShowDead(e.target.checked)}/> Hiện người chết
+                                </label>
+                            </div>
+                        </div>
+
+                        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 pb-20 md:pb-0">
+                            {visiblePlayers.map(player => {
+                                const role = rolesConfig.find(r => r.id === player.roleId) || {};
+                                const isDead = !player.isAlive;
+                                const teamColor = role.team === 'bad' ? 'text-red-400' : (role.team === 'neutral' ? 'text-yellow-400' : 'text-blue-400');
+                                const bgClass = isDead ? 'bg-black/40 border-neutral-800 opacity-60' : (role.team === 'bad' ? 'bg-red-950/20 border-red-900/30' : 'bg-neutral-800 border-neutral-700');
+
+                                return (
+                                    <div key={player.id} onClick={() => setEditingPlayer(player)} className={`relative p-3 rounded-lg border transition-all active:scale-95 cursor-pointer ${bgClass}`}>
+                                        <div className="flex items-center gap-3">
+                                            <div className={`w-10 h-10 rounded-lg flex items-center justify-center shrink-0 ${role.team === 'bad' ? 'bg-red-900/30 text-red-400' : 'bg-blue-900/30 text-blue-400'}`}>
+                                                {role.icon ? <role.icon size={20} /> : <Users size={20}/>}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <div className={`font-bold text-gray-100 truncate ${isDead ? 'line-through text-gray-500' : ''}`}>{player.name}</div>
+                                                <div className={`text-xs font-bold uppercase truncate ${teamColor}`}>{role.name}</div>
+                                            </div>
+                                            <Settings size={16} className="text-gray-600" />
+                                        </div>
+                                        <div className="flex flex-wrap gap-1 mt-2">
+                                            {player.hp > 1 && <span className="text-[10px] bg-green-900 text-green-100 px-1.5 py-0.5 rounded">HP:{player.hp}</span>}
+                                            {player.tags && player.tags.map(tId => {
+                                                const tag = STATUS_TAGS.find(t=>t.id===tId);
+                                                return tag ? <span key={tId} className="text-[10px] bg-neutral-700 text-gray-300 px-1.5 py-0.5 rounded">{tag.emoji}</span> : null
+                                            })}
+                                        </div>
+                                    </div>
+                                );
+                            })}
+                        </div>
+                    </div>
+
+                    {/* Modals */}
+                    {editingPlayer && (
+                        <PlayerActionModal 
+                            player={editingPlayer}
+                            roles={rolesConfig}
+                            onClose={() => setEditingPlayer(null)}
+                            onUpdate={(id, data) => setPlayers(prev => prev.map(p => p.id === id ? { ...p, ...data } : p))}
+                            onKill={(id) => {
+                                setPlayers(prev => prev.map(p => p.id === id ? { ...p, isAlive: false } : p));
+                                setGameLog(prev => [`${editingPlayer.name} đã chết.`, ...prev]);
+                            }}
+                            onRevive={(id) => {
+                                setPlayers(prev => prev.map(p => p.id === id ? { ...p, isAlive: true } : p));
+                                setGameLog(prev => [`${editingPlayer.name} hồi sinh.`, ...prev]);
+                            }}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>
