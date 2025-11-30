@@ -466,9 +466,22 @@
                             <h2 className="text-4xl md:text-5xl font-title text-red-600 text-glow tracking-widest mb-1">{phase === 'GAME_NIGHT' ? `ĐÊM THỨ ${dayCount}` : `NGÀY THỨ ${dayCount}`}</h2>
                             <button onClick={endGame} className="btn-normal absolute top-4 left-4 text-[10px] border border-gray-800 px-2 py-1 rounded text-gray-600 hover:text-red-500 hover:border-red-900 transition-colors uppercase">Thoát</button>
                         </div>
-                        
+
                         <div className="flex-1 min-h-0 overflow-y-auto p-4 space-y-6 scroll-view custom-scrollbar pb-32 md:pb-20">
-                             {/* History */}
+                            
+                            <div className="flex items-center justify-between pb-2 border-b border-neutral-800">
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-widest flex items-center gap-2">
+                                    Diễn biến
+                                </span>
+                                <button 
+                                    onClick={clearNightTags} 
+                                    className="btn-normal py-1.5 px-3 bg-neutral-800 hover:bg-neutral-700 hover:text-white rounded text-gray-400 border border-neutral-700 flex items-center gap-2 transition-all text-[10px] tracking-wider active:scale-95"
+                                >
+                                    <Refresh size={12}/> RESET TAG
+                                </button>
+                            </div>
+
+                            {/* History */}
                              {history.length > 0 && (
                                 <div className="bg-black/40 border border-neutral-800 rounded-lg p-3 max-h-40 overflow-y-auto text-xs custom-scrollbar">
                                     <div className="flex items-center gap-1 text-gray-500 font-bold mb-2 uppercase tracking-wider sticky top-0 bg-black/90 p-1"><HistoryIcon size={12}/> Lịch Sử</div>
@@ -499,9 +512,6 @@
                                     <button onClick={endDay} className="btn-normal w-full py-3 bg-purple-900 hover:bg-purple-800 rounded-xl text-lg tracking-[2px] border border-purple-700 text-white mt-4 active:scale-95">VÀO BAN ĐÊM</button>
                                 </div>
                             )}
-                        </div>
-                        <div className="p-3 border-t border-neutral-800 bg-neutral-900/90 absolute bottom-14 md:bottom-0 w-full z-30">
-                            <button onClick={clearNightTags} className="btn-normal w-full py-2 bg-neutral-800 hover:bg-neutral-700 rounded-lg text-gray-400 border border-neutral-700 flex items-center justify-center gap-2 transition-all text-[10px] tracking-wider active:scale-95"><Refresh size={14}/> QUÉT SẠCH TRẠNG THÁI</button>
                         </div>
                     </div>
                     
